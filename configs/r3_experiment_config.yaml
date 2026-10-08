@@ -1,0 +1,83 @@
+# Research 3 — Cross-Mechanism VO Failure Generalization Experiment Configuration
+
+study_name: "Research 3: Cross-Mechanism VO Failure Generalization"
+version: "1.0.0"
+date: "2026-10-08"
+
+hypotheses:
+  H1: "Mechanism-General Prediction — The R2 predictor learned a general precursor of VO failure that transfers across physical mechanisms, retaining meaningful discrimination and early warnings under visual degradation with benign vehicle motion."
+  H2: "Motion-Specific Proxy — The R2 predictor learned a motion-specific proxy conditioned on the aggressive-motion regime, and degrades substantially toward chance when VO failure is visually induced under benign vehicle motion."
+
+frozen_r2_artifacts:
+  mlp_checkpoint: "models/expanded_mlp.pt"
+  mlp_sha256: "93acd1048a6954a143aac873a3fa8a4548c8a6230aa574aa1ea3fcce17b78e9f"
+  scaler: "models/expanded_scaler.joblib"
+  scaler_sha256: "4e9c6ebacb5ac4a554ed69a56d4c7c48df8ef1036b53907181b6dc221550b105"
+  architecture: "SmallMLP(15, 32, 16, 1)"
+  threshold: 0.5
+  horizon_k: 5
+  horizon_time_s: 0.165
+
+base_benign_flights:
+  trajectories:
+    - name: "G_C"
+      description: "Gentle Cruise (yaw rate ~7.5 deg/s, speed ~0.8 m/s, zero braking)"
+      repeats: ["sweep_G_C_R1", "sweep_G_C_R2", "sweep_G_C_R3"]
+    - name: "G_S"
+      description: "Gentle Sharp Stop (yaw rate ~7.5 deg/s, speed ~0.8 m/s, 2 held stops)"
+      repeats: ["sweep_G_S_R1", "sweep_G_S_R2", "sweep_G_S_R3"]
+    - name: "G_B"
+      description: "Gentle Braking (yaw rate ~7.5 deg/s, speed ~0.8 m/s, 4 gentle braking pulses)"
+      repeats: ["sweep_G_B_R2", "sweep_G_B_R3"]
+
+exploratory_excluded_flights:
+  - name: "p3x_HOVER_L0_R1"
+    reason: "Zero-translation baseline causes epipolar degeneracy for 5-point Essential matrix VO"
+  - name: "p3x_HOVER_L0_R2"
+    reason: "Zero-translation baseline causes epipolar degeneracy for 5-point Essential matrix VO"
+  - name: "p3x_HOVER_L0_R3"
+    reason: "Zero-translation baseline causes epipolar degeneracy for 5-point Essential matrix VO"
+
+degradation_regimes:
+  NOMINAL:
+    type: "constant"
+    alpha: 0.000
+    description: "Nominal environment (100% texture, clear visibility)"
+  LOW:
+    type: "constant"
+    alpha: 0.920
+    description: "Low degradation (8% gradient retention, mild visual degradation)"
+  MEDIUM:
+    type: "constant"
+    alpha: 0.960
+    description: "Medium degradation (4% gradient retention, moderate failure rate ~30-35%)"
+  HIGH:
+    type: "constant"
+    alpha: 0.985
+    description: "High degradation (1.5% gradient retention, severe breakdown ~65-75%)"
+  TRANSITION:
+    type: "dynamic"
+    alpha_start: 0.000
+    alpha_end: 0.975
+    transition_frames: [200, 350]
+    description: "Dynamic visual degradation onset during steady flight (evaluates early warning dynamics)"
+
+evaluation_metrics:
+  - auroc
+  - auprc
+  - f1
+  - precision
+  - recall
+  - confusion_matrix
+  - warning_rate
+  - early_warning_rate
+  - missed_failure_rate
+  - post_failure_detection_rate
+  - lead_time_s
+
+statistical_analysis:
+  bootstrap_iterations: 2000
+  confidence_level: 0.95
+  tests:
+    - paired_bootstrap_delta
+    - wilcoxon_signed_rank

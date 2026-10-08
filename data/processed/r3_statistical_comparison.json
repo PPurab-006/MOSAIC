@@ -1,0 +1,199 @@
+{
+  "classification": "A. MECHANISM-GENERAL PREDICTION SUPPORTED",
+  "classification_rationale": "The frozen R2 predictor retained strong predictive discrimination (AUROC = 0.7906, 95% CI [0.7856, 0.7958]) and sustained high early-warning rate (90.6%) under visually induced failure with benign motion.",
+  "primary_hypotheses": {
+    "H1": "Mechanism-General Prediction",
+    "H2": "Motion-Specific Proxy"
+  },
+  "verdict_details": {
+    "motion_separation_verified": true,
+    "motion_separation_cohen_d": 1.2956,
+    "motion_separation_p_value": 0.0,
+    "r2_test_auroc": 0.8045941070325366,
+    "r3_overall_auroc": 0.7906,
+    "delta_auroc": -0.014,
+    "r2_test_f1": 0.6483570377636096,
+    "r3_overall_f1": 0.6489,
+    "delta_f1": 0.0005,
+    "r2_early_warning_rate_pct": 79.33,
+    "r3_early_warning_rate_pct": 90.58,
+    "delta_early_warning_rate_pct": 11.25
+  },
+  "bootstrap_95_confidence_intervals": {
+    "overall": {
+      "auroc": {
+        "mean": 0.7906,
+        "std": 0.0026,
+        "ci_95_lower": 0.7856,
+        "ci_95_upper": 0.7958
+      },
+      "auprc": {
+        "mean": 0.8618,
+        "std": 0.0025,
+        "ci_95_lower": 0.857,
+        "ci_95_upper": 0.8669
+      },
+      "f1": {
+        "mean": 0.6489,
+        "std": 0.0033,
+        "ci_95_lower": 0.6422,
+        "ci_95_upper": 0.6552
+      },
+      "precision": {
+        "mean": 0.9388,
+        "std": 0.0024,
+        "ci_95_lower": 0.9341,
+        "ci_95_upper": 0.9437
+      },
+      "recall": {
+        "mean": 0.4958,
+        "std": 0.0036,
+        "ci_95_lower": 0.4886,
+        "ci_95_upper": 0.5029
+      }
+    },
+    "regimes": {
+      "NOMINAL": {
+        "auroc": {
+          "mean": 0.7935,
+          "std": 0.0099,
+          "ci_95_lower": 0.7734,
+          "ci_95_upper": 0.8126
+        },
+        "auprc": {
+          "mean": 0.5226,
+          "std": 0.0185,
+          "ci_95_lower": 0.4849,
+          "ci_95_upper": 0.5583
+        },
+        "f1": {
+          "mean": 0.5137,
+          "std": 0.0167,
+          "ci_95_lower": 0.4799,
+          "ci_95_upper": 0.545
+        },
+        "precision": {
+          "mean": 0.5906,
+          "std": 0.0202,
+          "ci_95_lower": 0.5523,
+          "ci_95_upper": 0.6301
+        },
+        "recall": {
+          "mean": 0.4548,
+          "std": 0.0181,
+          "ci_95_lower": 0.4184,
+          "ci_95_upper": 0.4904
+        }
+      },
+      "LOW": {
+        "auroc": {
+          "mean": 0.7576,
+          "std": 0.0073,
+          "ci_95_lower": 0.7424,
+          "ci_95_upper": 0.7711
+        },
+        "auprc": {
+          "mean": 0.7228,
+          "std": 0.0088,
+          "ci_95_lower": 0.7057,
+          "ci_95_upper": 0.7401
+        },
+        "f1": {
+          "mean": 0.5242,
+          "std": 0.0109,
+          "ci_95_lower": 0.5038,
+          "ci_95_upper": 0.5458
+        },
+        "precision": {
+          "mean": 0.911,
+          "std": 0.0095,
+          "ci_95_lower": 0.8915,
+          "ci_95_upper": 0.9292
+        },
+        "recall": {
+          "mean": 0.368,
+          "std": 0.0103,
+          "ci_95_lower": 0.3483,
+          "ci_95_upper": 0.3882
+        }
+      },
+      "MEDIUM": {
+        "auroc": {
+          "mean": 0.385,
+          "std": 0.0228,
+          "ci_95_lower": 0.3416,
+          "ci_95_upper": 0.4319
+        },
+        "auprc": {
+          "mean": 0.9511,
+          "std": 0.0041,
+          "ci_95_lower": 0.9426,
+          "ci_95_upper": 0.9591
+        },
+        "f1": {
+          "mean": 0.5518,
+          "std": 0.0064,
+          "ci_95_lower": 0.5388,
+          "ci_95_upper": 0.5639
+        },
+        "precision": {
+          "mean": 0.9553,
+          "std": 0.0043,
+          "ci_95_lower": 0.9466,
+          "ci_95_upper": 0.9634
+        },
+        "recall": {
+          "mean": 0.3879,
+          "std": 0.0062,
+          "ci_95_lower": 0.3758,
+          "ci_95_upper": 0.3996
+        }
+      },
+      "TRANSITION": {
+        "auroc": {
+          "mean": 0.6737,
+          "std": 0.0067,
+          "ci_95_lower": 0.6608,
+          "ci_95_upper": 0.6871
+        },
+        "auprc": {
+          "mean": 0.8066,
+          "std": 0.0065,
+          "ci_95_lower": 0.7941,
+          "ci_95_upper": 0.8189
+        },
+        "f1": {
+          "mean": 0.568,
+          "std": 0.0076,
+          "ci_95_lower": 0.5529,
+          "ci_95_upper": 0.5823
+        },
+        "precision": {
+          "mean": 0.9025,
+          "std": 0.0071,
+          "ci_95_lower": 0.888,
+          "ci_95_upper": 0.9166
+        },
+        "recall": {
+          "mean": 0.4144,
+          "std": 0.0076,
+          "ci_95_lower": 0.3994,
+          "ci_95_upper": 0.4292
+        }
+      }
+    }
+  },
+  "hypothesis_tests": {
+    "mann_whitney_u_vs_r2_test": {
+      "statistic": 312.0,
+      "p_value": 0.03670811925082838,
+      "r3_significantly_lower": true,
+      "p_value_one_sided_lower": 0.01835405962541419
+    },
+    "one_sample_wilcoxon_vs_chance": {
+      "statistic": 67.0,
+      "p_value": 9.054644033312798e-05,
+      "reject_null_chance": true
+    }
+  }
+}

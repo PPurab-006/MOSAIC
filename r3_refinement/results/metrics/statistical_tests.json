@@ -1,0 +1,59 @@
+{
+  "r3_visual_test_paired_tests": {
+    "n_trials": 15,
+    "recall": {
+      "mean_diff": 0.2878,
+      "std_diff": 0.232,
+      "wilcoxon_stat": 119.0,
+      "wilcoxon_p_value": 6.103515625e-05,
+      "t_stat": 4.803316777940699,
+      "t_p_value": 0.00014040451148937636,
+      "cohen_d": 1.2402
+    },
+    "f1": {
+      "mean_diff": 0.183,
+      "std_diff": 0.1894,
+      "wilcoxon_stat": 103.0,
+      "wilcoxon_p_value": 0.0062255859375,
+      "t_stat": 3.7416707609484803,
+      "t_p_value": 0.001094575406545973,
+      "cohen_d": 0.9661
+    },
+    "auroc": {
+      "mean_diff": 0.1518,
+      "std_diff": 0.1865,
+      "wilcoxon_stat": 59.0,
+      "wilcoxon_p_value": 0.064697265625,
+      "cohen_d": 0.8137
+    },
+    "model_b_vs_model_c_recall": {
+      "mean_diff": 0.2582,
+      "wilcoxon_p_value": 0.001007080078125,
+      "cohen_d": 1.102
+    }
+  },
+  "r2_motion_test_paired_tests": {
+    "n_flights": 14,
+    "recall": {
+      "mean_diff": -0.0344,
+      "std_diff": 0.0658,
+      "wilcoxon_stat": 22.5,
+      "wilcoxon_p_value": 0.10786563422554954,
+      "cohen_d": -0.5218
+    },
+    "f1": {
+      "mean_diff": -0.0031,
+      "std_diff": 0.0355,
+      "wilcoxon_stat": 49.0,
+      "wilcoxon_p_value": 0.855224609375,
+      "cohen_d": -0.0867
+    },
+    "auroc": {
+      "mean_diff": -0.0074,
+      "std_diff": 0.0224,
+      "wilcoxon_stat": 36.0,
+      "wilcoxon_p_value": 0.3258056640625,
+      "cohen_d": -0.3305
+    }
+  }
+}

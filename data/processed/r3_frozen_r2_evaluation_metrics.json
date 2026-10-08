@@ -1,0 +1,149 @@
+{
+  "r2_test_baseline": {
+    "dataset": "Expanded 42-Flight Sweep (Held-out Test)",
+    "test_flights": 14,
+    "test_frames": 10411,
+    "test_positive_rate_pct": 34.61722946166992,
+    "auroc": 0.8045941070325366,
+    "auprc": 0.7259839095988775,
+    "f1": 0.6483570377636096,
+    "precision": 0.5808435852372583,
+    "recall": 0.7336293007769146,
+    "early_warning_rate_pct": 79.33,
+    "median_lead_time_s": 0.165
+  },
+  "r3_overall_transfer_metrics": {
+    "total_samples": 30545,
+    "positive_samples": 18761,
+    "positive_rate_pct": 61.42,
+    "auroc": 0.7906,
+    "auprc": 0.8618,
+    "f1": 0.6489,
+    "precision": 0.9388,
+    "recall": 0.4958,
+    "tn": 11178,
+    "fp": 606,
+    "fn": 9459,
+    "tp": 9302,
+    "warning_rate_pct": 32.44
+  },
+  "deltas_vs_r2": {
+    "auroc_delta": -0.014,
+    "auprc_delta": 0.1358,
+    "f1_delta": 0.0005,
+    "precision_delta": 0.358,
+    "recall_delta": -0.2378
+  },
+  "regime_breakdown": {
+    "NOMINAL": {
+      "total_samples": 6109,
+      "positive_samples": 798,
+      "positive_rate_pct": 13.06,
+      "auroc": 0.7929,
+      "auprc": 0.5216,
+      "f1": 0.5131,
+      "precision": 0.5905,
+      "recall": 0.4536,
+      "tn": 5060,
+      "fp": 251,
+      "fn": 436,
+      "tp": 362,
+      "warning_rate_pct": 10.03
+    },
+    "LOW": {
+      "total_samples": 6109,
+      "positive_samples": 2107,
+      "positive_rate_pct": 34.49,
+      "auroc": 0.7573,
+      "auprc": 0.7222,
+      "f1": 0.5235,
+      "precision": 0.9106,
+      "recall": 0.3673,
+      "tn": 3926,
+      "fp": 76,
+      "fn": 1333,
+      "tp": 774,
+      "warning_rate_pct": 13.91
+    },
+    "MEDIUM": {
+      "total_samples": 6109,
+      "positive_samples": 5898,
+      "positive_rate_pct": 96.55,
+      "auroc": 0.3845,
+      "auprc": 0.951,
+      "f1": 0.552,
+      "precision": 0.9553,
+      "recall": 0.3881,
+      "tn": 104,
+      "fp": 107,
+      "fn": 3609,
+      "tp": 2289,
+      "warning_rate_pct": 39.22
+    },
+    "HIGH": {
+      "total_samples": 6109,
+      "positive_samples": 6109,
+      "positive_rate_pct": 100.0,
+      "auroc": NaN,
+      "auprc": NaN,
+      "f1": 0.8242,
+      "precision": 1.0,
+      "recall": 0.7009,
+      "tn": 0,
+      "fp": 0,
+      "fn": 1827,
+      "tp": 4282,
+      "warning_rate_pct": 70.09
+    },
+    "TRANSITION": {
+      "total_samples": 6109,
+      "positive_samples": 3849,
+      "positive_rate_pct": 63.01,
+      "auroc": 0.6738,
+      "auprc": 0.8067,
+      "f1": 0.568,
+      "precision": 0.9027,
+      "recall": 0.4144,
+      "tn": 2088,
+      "fp": 172,
+      "fn": 2254,
+      "tp": 1595,
+      "warning_rate_pct": 28.92
+    }
+  },
+  "regime_deltas_vs_r2": {
+    "NOMINAL": {
+      "auroc_delta": -0.0117,
+      "auprc_delta": -0.2044,
+      "f1_delta": -0.1353,
+      "recall_delta": -0.28
+    },
+    "LOW": {
+      "auroc_delta": -0.0473,
+      "auprc_delta": -0.0038,
+      "f1_delta": -0.1249,
+      "recall_delta": -0.3663
+    },
+    "MEDIUM": {
+      "auroc_delta": -0.4201,
+      "auprc_delta": 0.225,
+      "f1_delta": -0.0964,
+      "recall_delta": -0.3455
+    },
+    "TRANSITION": {
+      "auroc_delta": -0.1308,
+      "auprc_delta": 0.0807,
+      "f1_delta": -0.0804,
+      "recall_delta": -0.3192
+    }
+  },
+  "per_flight_summary": {
+    "total_flights": 40,
+    "mean_auroc": 0.6502,
+    "std_auroc": 0.176,
+    "min_auroc": 0.1872,
+    "max_auroc": 0.8316,
+    "mean_f1": 0.5965,
+    "mean_recall": 0.4649
+  }
+}

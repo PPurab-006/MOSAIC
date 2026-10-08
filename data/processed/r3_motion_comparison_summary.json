@@ -1,0 +1,87 @@
+{
+  "r3_overall": {
+    "samples": 30545,
+    "yaw_rate_deg_s": {
+      "mean": 10.92,
+      "std": 18.31,
+      "p50": 7.31,
+      "p95": 35.89,
+      "max": 167.37
+    },
+    "optical_flow_px": {
+      "mean": 5.05,
+      "std": 7.6,
+      "p50": 3.45,
+      "p95": 19.78,
+      "max": 75.9
+    },
+    "is_r_frame_pct": 9.59,
+    "gt_speed_mps": {
+      "mean": 1.81,
+      "median": 0.98,
+      "p95": 7.58
+    },
+    "gt_tilt_deg": {
+      "mean": 4.29,
+      "median": 1.71,
+      "p95": 26.93
+    }
+  },
+  "r2_test_baseline": {
+    "samples": 10411,
+    "yaw_rate_deg_s": {
+      "mean": 41.55,
+      "std": 34.86,
+      "p50": 35.7,
+      "p95": 101.72,
+      "max": 187.31
+    },
+    "optical_flow_px": {
+      "mean": 18.61,
+      "std": 13.81,
+      "p50": 16.36,
+      "p95": 42.3,
+      "max": 82.44
+    },
+    "is_r_frame_pct": 70.52
+  },
+  "r2_aggressive_regime": {
+    "samples": 17735,
+    "yaw_rate_deg_s": {
+      "mean": 61.09,
+      "std": 32.05,
+      "p50": 53.0,
+      "p95": 109.33,
+      "max": 464.86
+    },
+    "optical_flow_px": {
+      "mean": 25.13,
+      "std": 13.37,
+      "p50": 24.11,
+      "p95": 44.86,
+      "max": 82.44
+    }
+  },
+  "distributional_separation_statistics": {
+    "yaw_rate_vs_r2_test": {
+      "ks_statistic": 0.6131,
+      "p_value": 0.0,
+      "cohen_d": 1.2956
+    },
+    "yaw_rate_vs_r2_aggressive": {
+      "ks_statistic": 0.8168,
+      "p_value": 0.0,
+      "cohen_d": 2.0661
+    },
+    "optical_flow_vs_r2_test": {
+      "ks_statistic": 0.598,
+      "p_value": 0.0,
+      "cohen_d": 1.4174
+    },
+    "optical_flow_vs_r2_aggressive": {
+      "ks_statistic": 0.7567,
+      "p_value": 0.0,
+      "cohen_d": 1.9869
+    }
+  }
+}

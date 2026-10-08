@@ -1,0 +1,135 @@
+{
+  "study": "Research 3 Refinement: Cross-Mechanism Sensitivity Recovery",
+  "split_strategy": "Strict Flight-Level Partitioning",
+  "r2_motion_mechanism": {
+    "protected_test_flights": [
+      "sweep_G_C_R1",
+      "sweep_G_B_R2",
+      "sweep_G_S_R2",
+      "sweep_M_C_R1",
+      "sweep_M_B_R3",
+      "sweep_M_S_R2",
+      "sweep_A_C_R1",
+      "sweep_A_B_R3",
+      "sweep_A_S_R3",
+      "sweep_A_H_R2",
+      "sweep_E_C_R1",
+      "sweep_E_B_R3",
+      "sweep_E_S_R2",
+      "sweep_E_H_R3"
+    ],
+    "train_flights": [
+      "sweep_G_C_R2",
+      "sweep_G_B_R3",
+      "sweep_G_S_R3",
+      "sweep_M_C_R2",
+      "sweep_M_B_R2",
+      "sweep_M_S_R3",
+      "sweep_M_H_R1",
+      "sweep_A_C_R2",
+      "sweep_A_B_R1",
+      "sweep_A_S_R2",
+      "sweep_A_H_R1",
+      "sweep_E_C_R2",
+      "sweep_E_B_R2",
+      "sweep_E_S_R3",
+      "sweep_E_H_R1"
+    ],
+    "val_flights": [
+      "sweep_G_C_R3",
+      "sweep_G_S_R1",
+      "sweep_M_C_R3",
+      "sweep_M_B_R1",
+      "sweep_M_S_R1",
+      "sweep_A_C_R3",
+      "sweep_A_B_R2",
+      "sweep_A_S_R1",
+      "sweep_A_H_R3",
+      "sweep_E_C_R3",
+      "sweep_E_B_R1",
+      "sweep_E_S_R1",
+      "sweep_E_H_R2"
+    ],
+    "total_flights": 42,
+    "counts": {
+      "train": 15,
+      "val": 13,
+      "test": 14
+    }
+  },
+  "r3_visual_mechanism": {
+    "protected_test_trials": [
+      "r3_sweep_G_C_R1_nominal",
+      "r3_sweep_G_C_R1_low",
+      "r3_sweep_G_C_R1_medium",
+      "r3_sweep_G_C_R1_high",
+      "r3_sweep_G_C_R1_transition",
+      "r3_sweep_G_S_R2_nominal",
+      "r3_sweep_G_S_R2_low",
+      "r3_sweep_G_S_R2_medium",
+      "r3_sweep_G_S_R2_high",
+      "r3_sweep_G_S_R2_transition",
+      "r3_sweep_G_B_R2_nominal",
+      "r3_sweep_G_B_R2_low",
+      "r3_sweep_G_B_R2_medium",
+      "r3_sweep_G_B_R2_high",
+      "r3_sweep_G_B_R2_transition"
+    ],
+    "train_trials": [
+      "r3_sweep_G_C_R2_nominal",
+      "r3_sweep_G_C_R2_low",
+      "r3_sweep_G_C_R2_medium",
+      "r3_sweep_G_C_R2_high",
+      "r3_sweep_G_C_R2_transition",
+      "r3_sweep_G_S_R3_nominal",
+      "r3_sweep_G_S_R3_low",
+      "r3_sweep_G_S_R3_medium",
+      "r3_sweep_G_S_R3_high",
+      "r3_sweep_G_S_R3_transition",
+      "r3_sweep_G_B_R3_nominal",
+      "r3_sweep_G_B_R3_low",
+      "r3_sweep_G_B_R3_medium",
+      "r3_sweep_G_B_R3_high",
+      "r3_sweep_G_B_R3_transition"
+    ],
+    "val_trials": [
+      "r3_sweep_G_C_R3_nominal",
+      "r3_sweep_G_C_R3_low",
+      "r3_sweep_G_C_R3_medium",
+      "r3_sweep_G_C_R3_high",
+      "r3_sweep_G_C_R3_transition",
+      "r3_sweep_G_S_R1_nominal",
+      "r3_sweep_G_S_R1_low",
+      "r3_sweep_G_S_R1_medium",
+      "r3_sweep_G_S_R1_high",
+      "r3_sweep_G_S_R1_transition"
+    ],
+    "base_flight_mapping": {
+      "train_base_flights": [
+        "sweep_G_C_R2",
+        "sweep_G_S_R3",
+        "sweep_G_B_R3"
+      ],
+      "val_base_flights": [
+        "sweep_G_C_R3",
+        "sweep_G_S_R1"
+      ],
+      "protected_test_base_flights": [
+        "sweep_G_C_R1",
+        "sweep_G_B_R2",
+        "sweep_G_S_R2"
+      ]
+    },
+    "counts": {
+      "train": 15,
+      "val": 10,
+      "test": 15
+    }
+  },
+  "guarantees": [
+    "Protected R2 test flights were never seen during R2 or R3 refinement.",
+    "Protected R3 test trials were never seen during refinement training or threshold selection.",
+    "All hyperparameter and threshold selection performed exclusively on validation sets.",
+    "Zero frame-level overlap between train, validation, and test splits."
+  ]
+}

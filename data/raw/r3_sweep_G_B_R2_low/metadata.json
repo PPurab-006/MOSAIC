@@ -1,0 +1,15 @@
+{
+  "trial_id": "r3_sweep_G_B_R2_low",
+  "trial_num": 32,
+  "base_flight": "sweep_G_B_R2",
+  "trajectory": "G_B",
+  "source_dataset_dir": "/home/purab/Purab/Projects/ROS/results/datasets/sweep_G_B_R2",
+  "regime": "LOW",
+  "regime_type": "constant",
+  "description": "Low degradation (8% gradient retention, mild visual degradation)",
+  "active_duration_s": 24.77,
+  "active_frames": 751,
+  "t0": 18.646,
+  "t1": 43.42,
+  "alpha": 0.92
+}

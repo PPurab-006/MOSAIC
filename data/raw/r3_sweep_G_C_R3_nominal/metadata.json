@@ -1,0 +1,15 @@
+{
+  "trial_id": "r3_sweep_G_C_R3_nominal",
+  "trial_num": 11,
+  "base_flight": "sweep_G_C_R3",
+  "trajectory": "G_C",
+  "source_dataset_dir": "/home/purab/Purab/Projects/ROS/results/datasets/sweep_G_C_R3",
+  "regime": "NOMINAL",
+  "regime_type": "constant",
+  "description": "Nominal environment (100% texture, clear visibility)",
+  "active_duration_s": 26.52,
+  "active_frames": 803,
+  "t0": 17.597,
+  "t1": 44.12,
+  "alpha": 0.0
+}

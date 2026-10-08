@@ -1,0 +1,107 @@
+{
+  "protected_r2_motion_test": {
+    "model_a_frozen_r2": {
+      "total_episodes": 647,
+      "early_warnings": 519,
+      "early_rate_pct": 80.22,
+      "post_detections": 127,
+      "post_rate_pct": 19.63,
+      "missed_failures": 1,
+      "missed_rate_pct": 0.15,
+      "median_lead_s": 0.1332,
+      "mean_lead_s": 0.124
+    },
+    "model_b_refined_mlp": {
+      "total_episodes": 647,
+      "early_warnings": 494,
+      "early_rate_pct": 76.35,
+      "post_detections": 152,
+      "post_rate_pct": 23.49,
+      "missed_failures": 1,
+      "missed_rate_pct": 0.15,
+      "median_lead_s": 0.1332,
+      "mean_lead_s": 0.1233
+    },
+    "model_c_calibrated_frozen_r2": {
+      "total_episodes": 647,
+      "early_warnings": 532,
+      "early_rate_pct": 82.23,
+      "post_detections": 114,
+      "post_rate_pct": 17.62,
+      "missed_failures": 1,
+      "missed_rate_pct": 0.15,
+      "median_lead_s": 0.1332,
+      "mean_lead_s": 0.1265
+    }
+  },
+  "protected_r3_visual_test": {
+    "model_a_frozen_r2": {
+      "total_episodes": 2236,
+      "early_warnings": 2022,
+      "early_rate_pct": 90.43,
+      "post_detections": 197,
+      "post_rate_pct": 8.81,
+      "missed_failures": 17,
+      "missed_rate_pct": 0.76,
+      "median_lead_s": 0.132,
+      "mean_lead_s": 0.1313
+    },
+    "model_b_refined_mlp": {
+      "total_episodes": 2236,
+      "early_warnings": 2108,
+      "early_rate_pct": 94.28,
+      "post_detections": 128,
+      "post_rate_pct": 5.72,
+      "missed_failures": 0,
+      "missed_rate_pct": 0.0,
+      "median_lead_s": 0.165,
+      "mean_lead_s": 0.1621
+    },
+    "model_c_calibrated_frozen_r2": {
+      "total_episodes": 2236,
+      "early_warnings": 2063,
+      "early_rate_pct": 92.26,
+      "post_detections": 170,
+      "post_rate_pct": 7.6,
+      "missed_failures": 3,
+      "missed_rate_pct": 0.13,
+      "median_lead_s": 0.132,
+      "mean_lead_s": 0.1333
+    }
+  },
+  "full_40_flight_r3_dataset": {
+    "model_a_frozen_r2": {
+      "total_episodes": 5964,
+      "early_warnings": 5402,
+      "early_rate_pct": 90.58,
+      "post_detections": 520,
+      "post_rate_pct": 8.72,
+      "missed_failures": 42,
+      "missed_rate_pct": 0.7,
+      "median_lead_s": 0.132,
+      "mean_lead_s": 0.1311
+    },
+    "model_b_refined_mlp": {
+      "total_episodes": 5964,
+      "early_warnings": 5636,
+      "early_rate_pct": 94.5,
+      "post_detections": 327,
+      "post_rate_pct": 5.48,
+      "missed_failures": 1,
+      "missed_rate_pct": 0.02,
+      "median_lead_s": 0.165,
+      "mean_lead_s": 0.1618
+    },
+    "model_c_calibrated_frozen_r2": {
+      "total_episodes": 5964,
+      "early_warnings": 5500,
+      "early_rate_pct": 92.22,
+      "post_detections": 457,
+      "post_rate_pct": 7.66,
+      "missed_failures": 7,
+      "missed_rate_pct": 0.12,
+      "median_lead_s": 0.132,
+      "mean_lead_s": 0.1331
+    }
+  }
+}

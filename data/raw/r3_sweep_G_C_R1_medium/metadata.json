@@ -1,0 +1,15 @@
+{
+  "trial_id": "r3_sweep_G_C_R1_medium",
+  "trial_num": 3,
+  "base_flight": "sweep_G_C_R1",
+  "trajectory": "G_C",
+  "source_dataset_dir": "/home/purab/Purab/Projects/ROS/results/datasets/sweep_G_C_R1",
+  "regime": "MEDIUM",
+  "regime_type": "constant",
+  "description": "Medium degradation (4% gradient retention, moderate failure rate ~30-35%)",
+  "active_duration_s": 24.59,
+  "active_frames": 745,
+  "t0": 18.533,
+  "t1": 43.12,
+  "alpha": 0.96
+}

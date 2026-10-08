@@ -1,0 +1,54 @@
+study_name: "Research 3 Refinement: Cross-Mechanism Sensitivity Recovery"
+version: "1.0.0"
+date: "2026-10-08"
+
+frozen_r2_baseline:
+  model_path: "models/expanded_mlp.pt"
+  scaler_path: "models/expanded_scaler.joblib"
+  sha256_model: "93acd1048a6954a143aac873a3fa8a4548c8a6230aa574aa1ea3fcce17b78e9f"
+  sha256_scaler: "4e9c6ebacb5ac4a554ed69a56d4c7c48df8ef1036b53907181b6dc221550b105"
+  threshold: 0.50
+
+model_architecture:
+  name: "SmallMLP"
+  input_dim: 15
+  hidden1: 32
+  hidden2: 16
+  output_dim: 1
+  parameters: 1041
+
+feature_specification:
+  base_features:
+    - "eis_yaw_rate_deg"
+    - "feature_vel_mean"
+    - "is_r_frame"
+  lags: [0, 1, 2, 3, 5]
+  total_features: 15
+
+prediction_target:
+  label_definition: "num_inliers_pose < 8"
+  horizon_k: 5
+  horizon_time_s: 0.165
+
+training:
+  seed: 42
+  optimizer: "Adam"
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  batch_size: 256
+  max_epochs: 50
+  early_stopping_patience: 10
+  loss_function: "BCEWithLogitsLoss"
+
+threshold_selection:
+  target_split: "joint_validation"
+  metric: "f1_score"
+  search_grid: [0.05, 0.95, 0.01]
+  locked_prior_to_test: true
+
+splits_manifest: "r3_refinement/manifests/refinement_split_manifest.json"
+
+evaluation_datasets:
+  protected_r2_test: "14 held-out test flights from Research 2 (aggressive motion)"
+  protected_r3_test: "15 held-out test trials from Research 3 (visual degradation under benign motion)"
+  combined_cross_mechanism: "Union of protected R2 test and protected R3 test flights"

@@ -1,0 +1,44 @@
+trial_num,trial_id,base_flight,trajectory,regime,regime_type,parameter_alpha,active_frames,active_duration_s,eligible,exclusion_reason
+1,r3_sweep_G_C_R1_nominal,sweep_G_C_R1,G_C,NOMINAL,constant,0.0,745,24.59,True,N/A
+2,r3_sweep_G_C_R1_low,sweep_G_C_R1,G_C,LOW,constant,0.92,745,24.59,True,N/A
+3,r3_sweep_G_C_R1_medium,sweep_G_C_R1,G_C,MEDIUM,constant,0.96,745,24.59,True,N/A
+4,r3_sweep_G_C_R1_high,sweep_G_C_R1,G_C,HIGH,constant,0.985,745,24.59,True,N/A
+5,r3_sweep_G_C_R1_transition,sweep_G_C_R1,G_C,TRANSITION,dynamic,0.0->0.975,745,24.59,True,N/A
+6,r3_sweep_G_C_R2_nominal,sweep_G_C_R2,G_C,NOMINAL,constant,0.0,766,25.28,True,N/A
+7,r3_sweep_G_C_R2_low,sweep_G_C_R2,G_C,LOW,constant,0.92,766,25.28,True,N/A
+8,r3_sweep_G_C_R2_medium,sweep_G_C_R2,G_C,MEDIUM,constant,0.96,766,25.28,True,N/A
+9,r3_sweep_G_C_R2_high,sweep_G_C_R2,G_C,HIGH,constant,0.985,766,25.28,True,N/A
+10,r3_sweep_G_C_R2_transition,sweep_G_C_R2,G_C,TRANSITION,dynamic,0.0->0.975,766,25.28,True,N/A
+11,r3_sweep_G_C_R3_nominal,sweep_G_C_R3,G_C,NOMINAL,constant,0.0,803,26.52,True,N/A
+12,r3_sweep_G_C_R3_low,sweep_G_C_R3,G_C,LOW,constant,0.92,803,26.52,True,N/A
+13,r3_sweep_G_C_R3_medium,sweep_G_C_R3,G_C,MEDIUM,constant,0.96,803,26.52,True,N/A
+14,r3_sweep_G_C_R3_high,sweep_G_C_R3,G_C,HIGH,constant,0.985,803,26.52,True,N/A
+15,r3_sweep_G_C_R3_transition,sweep_G_C_R3,G_C,TRANSITION,dynamic,0.0->0.975,803,26.52,True,N/A
+16,r3_sweep_G_S_R1_nominal,sweep_G_S_R1,G_S,NOMINAL,constant,0.0,722,23.81,True,N/A
+17,r3_sweep_G_S_R1_low,sweep_G_S_R1,G_S,LOW,constant,0.92,722,23.81,True,N/A
+18,r3_sweep_G_S_R1_medium,sweep_G_S_R1,G_S,MEDIUM,constant,0.96,722,23.81,True,N/A
+19,r3_sweep_G_S_R1_high,sweep_G_S_R1,G_S,HIGH,constant,0.985,722,23.81,True,N/A
+20,r3_sweep_G_S_R1_transition,sweep_G_S_R1,G_S,TRANSITION,dynamic,0.0->0.975,722,23.81,True,N/A
+21,r3_sweep_G_S_R2_nominal,sweep_G_S_R2,G_S,NOMINAL,constant,0.0,826,27.28,True,N/A
+22,r3_sweep_G_S_R2_low,sweep_G_S_R2,G_S,LOW,constant,0.92,826,27.28,True,N/A
+23,r3_sweep_G_S_R2_medium,sweep_G_S_R2,G_S,MEDIUM,constant,0.96,826,27.28,True,N/A
+24,r3_sweep_G_S_R2_high,sweep_G_S_R2,G_S,HIGH,constant,0.985,826,27.28,True,N/A
+25,r3_sweep_G_S_R2_transition,sweep_G_S_R2,G_S,TRANSITION,dynamic,0.0->0.975,826,27.28,True,N/A
+26,r3_sweep_G_S_R3_nominal,sweep_G_S_R3,G_S,NOMINAL,constant,0.0,804,26.55,True,N/A
+27,r3_sweep_G_S_R3_low,sweep_G_S_R3,G_S,LOW,constant,0.92,804,26.55,True,N/A
+28,r3_sweep_G_S_R3_medium,sweep_G_S_R3,G_S,MEDIUM,constant,0.96,804,26.55,True,N/A
+29,r3_sweep_G_S_R3_high,sweep_G_S_R3,G_S,HIGH,constant,0.985,804,26.55,True,N/A
+30,r3_sweep_G_S_R3_transition,sweep_G_S_R3,G_S,TRANSITION,dynamic,0.0->0.975,804,26.55,True,N/A
+31,r3_sweep_G_B_R2_nominal,sweep_G_B_R2,G_B,NOMINAL,constant,0.0,751,24.77,True,N/A
+32,r3_sweep_G_B_R2_low,sweep_G_B_R2,G_B,LOW,constant,0.92,751,24.77,True,N/A
+33,r3_sweep_G_B_R2_medium,sweep_G_B_R2,G_B,MEDIUM,constant,0.96,751,24.77,True,N/A
+34,r3_sweep_G_B_R2_high,sweep_G_B_R2,G_B,HIGH,constant,0.985,751,24.77,True,N/A
+35,r3_sweep_G_B_R2_transition,sweep_G_B_R2,G_B,TRANSITION,dynamic,0.0->0.975,751,24.77,True,N/A
+36,r3_sweep_G_B_R3_nominal,sweep_G_B_R3,G_B,NOMINAL,constant,0.0,772,25.46,True,N/A
+37,r3_sweep_G_B_R3_low,sweep_G_B_R3,G_B,LOW,constant,0.92,772,25.46,True,N/A
+38,r3_sweep_G_B_R3_medium,sweep_G_B_R3,G_B,MEDIUM,constant,0.96,772,25.46,True,N/A
+39,r3_sweep_G_B_R3_high,sweep_G_B_R3,G_B,HIGH,constant,0.985,772,25.46,True,N/A
+40,r3_sweep_G_B_R3_transition,sweep_G_B_R3,G_B,TRANSITION,dynamic,0.0->0.975,772,25.46,True,N/A
+41,r3_p3x_HOVER_L0_R1_excluded,p3x_HOVER_L0_R1,HOVER,N/A,N/A,N/A,0,0.0,False,Zero-translation baseline causes epipolar degeneracy for 5-point Essential matrix VO
+42,r3_p3x_HOVER_L0_R2_excluded,p3x_HOVER_L0_R2,HOVER,N/A,N/A,N/A,0,0.0,False,Zero-translation baseline causes epipolar degeneracy for 5-point Essential matrix VO
+43,r3_p3x_HOVER_L0_R3_excluded,p3x_HOVER_L0_R3,HOVER,N/A,N/A,N/A,0,0.0,False,Zero-translation baseline causes epipolar degeneracy for 5-point Essential matrix VO

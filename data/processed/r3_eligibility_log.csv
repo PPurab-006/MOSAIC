@@ -1,0 +1,12 @@
+flight_name,trajectory,description,total_frames,active_frames,active_duration_s,status,exclusion_reason
+sweep_G_C_R1,G_C,"Gentle Cruise (yaw rate ~7.5 deg/s, speed ~0.8 m/s, zero braking)",1210,745,24.59,ELIGIBLE,"N/A (Met all duration, envelope, and stability criteria)"
+sweep_G_C_R2,G_C,"Gentle Cruise (yaw rate ~7.5 deg/s, speed ~0.8 m/s, zero braking)",1221,766,25.28,ELIGIBLE,"N/A (Met all duration, envelope, and stability criteria)"
+sweep_G_C_R3,G_C,"Gentle Cruise (yaw rate ~7.5 deg/s, speed ~0.8 m/s, zero braking)",1181,803,26.52,ELIGIBLE,"N/A (Met all duration, envelope, and stability criteria)"
+sweep_G_S_R1,G_S,"Gentle Sharp Stop (yaw rate ~7.5 deg/s, speed ~0.8 m/s, 2 held stops)",1215,722,23.81,ELIGIBLE,"N/A (Met all duration, envelope, and stability criteria)"
+sweep_G_S_R2,G_S,"Gentle Sharp Stop (yaw rate ~7.5 deg/s, speed ~0.8 m/s, 2 held stops)",1210,826,27.28,ELIGIBLE,"N/A (Met all duration, envelope, and stability criteria)"
+sweep_G_S_R3,G_S,"Gentle Sharp Stop (yaw rate ~7.5 deg/s, speed ~0.8 m/s, 2 held stops)",1214,804,26.55,ELIGIBLE,"N/A (Met all duration, envelope, and stability criteria)"
+sweep_G_B_R2,G_B,"Gentle Braking (yaw rate ~7.5 deg/s, speed ~0.8 m/s, 4 gentle braking pulses)",1215,751,24.77,ELIGIBLE,"N/A (Met all duration, envelope, and stability criteria)"
+sweep_G_B_R3,G_B,"Gentle Braking (yaw rate ~7.5 deg/s, speed ~0.8 m/s, 4 gentle braking pulses)",1209,772,25.46,ELIGIBLE,"N/A (Met all duration, envelope, and stability criteria)"
+p3x_HOVER_L0_R1,HOVER,Stationary hover (zero forward translation),953,0,0.0,EXCLUDED,Zero-translation baseline causes epipolar degeneracy for 5-point Essential matrix VO
+p3x_HOVER_L0_R2,HOVER,Stationary hover (zero forward translation),931,0,0.0,EXCLUDED,Zero-translation baseline causes epipolar degeneracy for 5-point Essential matrix VO
+p3x_HOVER_L0_R3,HOVER,Stationary hover (zero forward translation),923,0,0.0,EXCLUDED,Zero-translation baseline causes epipolar degeneracy for 5-point Essential matrix VO

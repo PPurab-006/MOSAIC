@@ -1,0 +1,15 @@
+{
+  "trial_id": "r3_sweep_G_S_R2_high",
+  "trial_num": 24,
+  "base_flight": "sweep_G_S_R2",
+  "trajectory": "G_S",
+  "source_dataset_dir": "/home/purab/Purab/Projects/ROS/results/datasets/sweep_G_S_R2",
+  "regime": "HIGH",
+  "regime_type": "constant",
+  "description": "High degradation (1.5% gradient retention, severe breakdown ~65-75%)",
+  "active_duration_s": 27.28,
+  "active_frames": 826,
+  "t0": 18.486,
+  "t1": 45.764,
+  "alpha": 0.985
+}

@@ -1,0 +1,163 @@
+{
+  "study": "Research 3: Cross-Mechanism VO Failure Generalization",
+  "frozen_baseline": "Research 2 Authoritative Expanded Model",
+  "freeze_date": "2026-10-08",
+  "integrity_status": "LOCKED_IMMUTABLE",
+  "artifacts": {
+    "mlp_checkpoint": {
+      "filename": "expanded_mlp.pt",
+      "sha256": "93acd1048a6954a143aac873a3fa8a4548c8a6230aa574aa1ea3fcce17b78e9f",
+      "architecture": "SmallMLP(Linear(15, 32) -> ReLU -> Linear(32, 16) -> ReLU -> Linear(16, 1))",
+      "weights_summary": {
+        "net.0.weight": {
+          "shape": [
+            32,
+            15
+          ],
+          "mean": -0.004757411777973175,
+          "std": 0.20767799019813538,
+          "min": -0.8582692742347717,
+          "max": 0.7114439010620117
+        },
+        "net.0.bias": {
+          "shape": [
+            32
+          ],
+          "mean": 0.025266200304031372,
+          "std": 0.18590405583381653,
+          "min": -0.2878745198249817,
+          "max": 0.4337465763092041
+        },
+        "net.2.weight": {
+          "shape": [
+            16,
+            32
+          ],
+          "mean": 0.006002099718898535,
+          "std": 0.2509007155895233,
+          "min": -1.2848538160324097,
+          "max": 0.9642137885093689
+        },
+        "net.2.bias": {
+          "shape": [
+            16
+          ],
+          "mean": 0.050424426794052124,
+          "std": 0.11648625880479813,
+          "min": -0.127082958817482,
+          "max": 0.2466183453798294
+        },
+        "net.4.weight": {
+          "shape": [
+            1,
+            16
+          ],
+          "mean": 0.08855259418487549,
+          "std": 0.5851532816886902,
+          "min": -0.9914418458938599,
+          "max": 0.8809964060783386
+        },
+        "net.4.bias": {
+          "shape": [
+            1
+          ],
+          "mean": -0.056791383773088455,
+          "std": NaN,
+          "min": -0.056791383773088455,
+          "max": -0.056791383773088455
+        }
+      }
+    },
+    "scaler": {
+      "filename": "expanded_scaler.joblib",
+      "sha256": "4e9c6ebacb5ac4a554ed69a56d4c7c48df8ef1036b53907181b6dc221550b105",
+      "n_features": 15,
+      "means": {
+        "eis_yaw_rate_deg_lag0": 40.255097736625515,
+        "eis_yaw_rate_deg_lag1": 40.26273844158168,
+        "eis_yaw_rate_deg_lag2": 40.270055340848096,
+        "eis_yaw_rate_deg_lag3": 40.274686965467886,
+        "eis_yaw_rate_deg_lag5": 40.281727312578276,
+        "feature_vel_mean_lag0": 18.504311567364464,
+        "feature_vel_mean_lag1": 18.494021524422973,
+        "feature_vel_mean_lag2": 18.481079736983357,
+        "feature_vel_mean_lag3": 18.46703234925747,
+        "feature_vel_mean_lag5": 18.439521256038645,
+        "is_r_frame_lag0": 0.7124709250313115,
+        "is_r_frame_lag1": 0.7126498479155484,
+        "is_r_frame_lag2": 0.7127393093576668,
+        "is_r_frame_lag3": 0.7128287707997852,
+        "is_r_frame_lag5": 0.7130076936840222
+      },
+      "scales": {
+        "eis_yaw_rate_deg_lag0": 34.4566163156514,
+        "eis_yaw_rate_deg_lag1": 34.45612435655147,
+        "eis_yaw_rate_deg_lag2": 34.45853241337421,
+        "eis_yaw_rate_deg_lag3": 34.459526942999155,
+        "eis_yaw_rate_deg_lag5": 34.46187095883923,
+        "feature_vel_mean_lag0": 13.917365826027565,
+        "feature_vel_mean_lag1": 13.923155181350419,
+        "feature_vel_mean_lag2": 13.931218615295668,
+        "feature_vel_mean_lag3": 13.938257992579311,
+        "feature_vel_mean_lag5": 13.949875189441247,
+        "is_r_frame_lag0": 0.45261032469038837,
+        "is_r_frame_lag1": 0.45252628893965274,
+        "is_r_frame_lag2": 0.452484238680225,
+        "is_r_frame_lag3": 0.45244216682339905,
+        "is_r_frame_lag5": 0.4523579582934446
+      }
+    }
+  },
+  "feature_specification": {
+    "base_features": [
+      "eis_yaw_rate_deg",
+      "feature_vel_mean",
+      "is_r_frame"
+    ],
+    "feature_lags": [
+      0,
+      1,
+      2,
+      3,
+      5
+    ],
+    "feature_names_ordered": [
+      "eis_yaw_rate_deg_lag0",
+      "eis_yaw_rate_deg_lag1",
+      "eis_yaw_rate_deg_lag2",
+      "eis_yaw_rate_deg_lag3",
+      "eis_yaw_rate_deg_lag5",
+      "feature_vel_mean_lag0",
+      "feature_vel_mean_lag1",
+      "feature_vel_mean_lag2",
+      "feature_vel_mean_lag3",
+      "feature_vel_mean_lag5",
+      "is_r_frame_lag0",
+      "is_r_frame_lag1",
+      "is_r_frame_lag2",
+      "is_r_frame_lag3",
+      "is_r_frame_lag5"
+    ],
+    "total_features": 15
+  },
+  "prediction_specification": {
+    "label_definition": "num_inliers_pose < 8 (Monocular 5-point Essential matrix pose inliers)",
+    "prediction_horizon_k": 5,
+    "horizon_time_s": 0.165,
+    "decision_threshold": 0.5,
+    "streaming_buffer_size": 6
+  },
+  "r2_test_baseline_performance": {
+    "dataset": "Expanded 42-Flight Sweep (Held-out Test)",
+    "test_flights": 14,
+    "test_frames": 10411,
+    "test_positive_rate_pct": 34.61722946166992,
+    "auroc": 0.8045941070325366,
+    "auprc": 0.7259839095988775,
+    "f1": 0.6483570377636096,
+    "precision": 0.5808435852372583,
+    "recall": 0.7336293007769146,
+    "early_warning_rate_pct": 79.33,
+    "median_lead_time_s": 0.165
+  }
+}

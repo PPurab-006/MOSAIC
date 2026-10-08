@@ -1,0 +1,20 @@
+{
+  "trial_id": "r3_sweep_G_B_R3_transition",
+  "trial_num": 40,
+  "base_flight": "sweep_G_B_R3",
+  "trajectory": "G_B",
+  "source_dataset_dir": "/home/purab/Purab/Projects/ROS/results/datasets/sweep_G_B_R3",
+  "regime": "TRANSITION",
+  "regime_type": "dynamic",
+  "description": "Dynamic visual degradation onset during steady flight (evaluates early warning dynamics)",
+  "active_duration_s": 25.46,
+  "active_frames": 772,
+  "t0": 18.23,
+  "t1": 43.695,
+  "alpha_start": 0.0,
+  "alpha_end": 0.975,
+  "transition_frames": [
+    200,
+    350
+  ]
+}

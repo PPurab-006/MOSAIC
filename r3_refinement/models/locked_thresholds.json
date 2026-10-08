@@ -1,0 +1,36 @@
+{
+  "model_a_frozen_r2": {
+    "model_path": "/home/purab/Purab/Projects/Research3/models/expanded_mlp.pt",
+    "scaler_path": "/home/purab/Purab/Projects/Research3/models/expanded_scaler.joblib",
+    "threshold": 0.5,
+    "description": "Original Frozen Research 2 Predictor at standard 0.50 threshold"
+  },
+  "model_b_refined_mlp": {
+    "model_path": "/home/purab/Purab/Projects/Research3/r3_refinement/models/refined_mlp.pt",
+    "scaler_path": "/home/purab/Purab/Projects/Research3/r3_refinement/models/refined_scaler.joblib",
+    "threshold": 0.37,
+    "val_metrics": {
+      "threshold": 0.37,
+      "val_f1": 0.7859,
+      "val_precision": 0.7803,
+      "val_recall": 0.7915,
+      "val_auroc": 0.8772,
+      "val_auprc": 0.8969
+    },
+    "description": "Cross-Mechanism Refined MLP trained on joint pool with validation-locked threshold"
+  },
+  "model_c_calibrated_frozen_r2": {
+    "model_path": "/home/purab/Purab/Projects/Research3/models/expanded_mlp.pt",
+    "scaler_path": "/home/purab/Purab/Projects/Research3/models/expanded_scaler.joblib",
+    "threshold": 0.46,
+    "val_metrics": {
+      "threshold": 0.46,
+      "val_f1": 0.6609,
+      "val_precision": 0.6845,
+      "val_recall": 0.639,
+      "val_auroc": 0.7182,
+      "val_auprc": 0.7273
+    },
+    "description": "Original Frozen R2 Model with threshold calibrated on joint validation pool"
+  }
+}

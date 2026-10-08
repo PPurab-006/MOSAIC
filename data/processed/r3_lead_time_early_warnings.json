@@ -1,0 +1,82 @@
+{
+  "overall_r3_early_warning_summary": {
+    "total_failure_episodes": 5964,
+    "early_warnings": 5402,
+    "early_warning_rate_pct": 90.58,
+    "post_failure_detections": 520,
+    "post_failure_rate_pct": 8.72,
+    "missed_failures": 42,
+    "missed_failure_rate_pct": 0.7,
+    "lead_time_s": {
+      "mean": 0.1311,
+      "median": 0.132,
+      "min": 0.033,
+      "max": 0.165
+    }
+  },
+  "r2_baseline_comparison": {
+    "r2_early_warning_rate_pct": 79.33,
+    "r3_early_warning_rate_pct": 90.58,
+    "early_warning_rate_delta": 11.25,
+    "r2_median_lead_time_s": 0.165,
+    "r3_median_lead_time_s": 0.132,
+    "median_lead_time_delta_s": -0.033
+  },
+  "regime_breakdown": {
+    "NOMINAL": {
+      "total_episodes": 148,
+      "early_warnings": 79,
+      "early_warning_rate_pct": 53.38,
+      "post_failure_detections": 68,
+      "post_detection_rate_pct": 45.95,
+      "missed_failures": 1,
+      "missed_failure_rate_pct": 0.68,
+      "median_lead_time_s": 0.165,
+      "mean_lead_time_s": 0.1362
+    },
+    "LOW": {
+      "total_episodes": 408,
+      "early_warnings": 184,
+      "early_warning_rate_pct": 45.1,
+      "post_failure_detections": 219,
+      "post_detection_rate_pct": 53.68,
+      "missed_failures": 5,
+      "missed_failure_rate_pct": 1.23,
+      "median_lead_time_s": 0.165,
+      "mean_lead_time_s": 0.1471
+    },
+    "MEDIUM": {
+      "total_episodes": 1986,
+      "early_warnings": 1888,
+      "early_warning_rate_pct": 95.07,
+      "post_failure_detections": 89,
+      "post_detection_rate_pct": 4.48,
+      "missed_failures": 9,
+      "missed_failure_rate_pct": 0.45,
+      "median_lead_time_s": 0.132,
+      "mean_lead_time_s": 0.1288
+    },
+    "HIGH": {
+      "total_episodes": 1814,
+      "early_warnings": 1771,
+      "early_warning_rate_pct": 97.63,
+      "post_failure_detections": 17,
+      "post_detection_rate_pct": 0.94,
+      "missed_failures": 26,
+      "missed_failure_rate_pct": 1.43,
+      "median_lead_time_s": 0.132,
+      "mean_lead_time_s": 0.1376
+    },
+    "TRANSITION": {
+      "total_episodes": 1608,
+      "early_warnings": 1480,
+      "early_warning_rate_pct": 92.04,
+      "post_failure_detections": 127,
+      "post_detection_rate_pct": 7.9,
+      "missed_failures": 1,
+      "missed_failure_rate_pct": 0.06,
+      "median_lead_time_s": 0.132,
+      "mean_lead_time_s": 0.1242
+    }
+  }
+}
