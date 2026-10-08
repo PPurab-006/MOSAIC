@@ -71,11 +71,11 @@ To decouple VO tracking failure from vehicle dynamics, failures were induced thr
 $$I_{\text{degraded}}(x, y) = (1 - \alpha) \cdot I_{\text{clean}}(x, y) + \alpha \cdot A_\infty$$
 
 Five controlled degradation regimes were evaluated across 8 repeatable flight trajectories:
-1. **Nominal ($\alpha = 0.00$)**: Unattenuated camera stream.
-2. **Low ($\alpha = 0.50$)**: Minor contrast reduction; features track normally.
-3. **Transition ($\alpha = 0.70$)**: Near tracking threshold; sporadic feature loss.
-4. **Medium ($\alpha = 0.85$)**: Substantial tracking degradation; intermittent solver collapse.
-5. **High ($\alpha = 0.95$)**: Severe feature dropout; continuous Essential matrix tracking failure.
+1. **Nominal ($\alpha = 0.000$)**: Unattenuated baseline camera stream (VO failure rate: 13.1%).
+2. **Low ($\alpha = 0.920$)**: High optical attenuation yet remaining below VO tracking collapse (VO failure rate: 34.5%).
+3. **Transition ($\alpha: 0.000 \to 0.975$)**: Dynamic linear ramp crossing the tracking collapse boundary (VO failure rate: 66.8%).
+4. **Medium ($\alpha = 0.960$)**: Severe contrast attenuation with intermittent solver failure (VO failure rate: 96.5%).
+5. **High ($\alpha = 0.985$)**: Extreme contrast attenuation inducing continuous Essential matrix tracking collapse (VO failure rate: 100.0%).
 
 ### Decoupled Dynamic Regime
 Vehicle dynamics were constrained to gentle maneuvers:
@@ -115,9 +115,9 @@ Comparing three models on the strictly protected, untouched test sets:
 
 | Test Partition / Metric | Model A (Frozen R2) | Model B (Refined MLP) | Model C (Calibrated R2) | Refinement Delta (B vs A) | Statistical Significance |
 |---|---|---|---|---|---|
-| **Visual Test: Recall** | 48.94% | **87.20%** | 51.68% | **+38.26%** | $p = 6.10 \times 10^{-5}$ ($d = 1.24$) |
-| **Visual Test: Precision** | **93.74%** | 92.68% | 93.30% | -1.06% | Stable ($p = 0.156$) |
-| **Visual Test: F1 Score** | 0.6419 | **0.8986** | 0.6654 | **+0.2567** | $p = 6.10 \times 10^{-5}$ |
+| **Visual Test: Recall** | 48.94% | **87.20%** | 51.83% | **+38.26%** | $p = 6.10 \times 10^{-5}$ ($d = 1.24$) |
+| **Visual Test: Precision** | **93.27%** | 92.70% | 92.04% | -0.57% | Stable ($p = 0.156$) |
+| **Visual Test: F1 Score** | 0.6419 | **0.8986** | 0.6636 | **+0.2567** | $p = 6.10 \times 10^{-5}$ |
 | **Visual Test: AUROC** | 0.7922 | **0.9371** | 0.7922 | **+0.1449** | $p = 6.10 \times 10^{-5}$ |
 | **Motion Test: AUROC** | **0.8046** | **0.8014** | 0.8046 | -0.0032 | $p = 0.3258$ (No degradation) |
 | **Motion Test: F1 Score** | **0.6484** | **0.6466** | 0.6460 | -0.0018 | $p = 0.8552$ (Preserved) |
@@ -130,40 +130,57 @@ Comparing three models on the strictly protected, untouched test sets:
 
 | Evaluation Subset | Model A (Frozen R2) | Model B (Refined MLP) | Improvement |
 |---|---|---|---|
-| **Visual Test Pre-Failure Warnings** | 90.43% (1,995/2,206) | **94.28%** (2,080/2,206) | **+3.85% (+85 episodes)** |
-| **Visual Test Missed Episodes** | 0.45% (10/2,206) | **0.00%** (0/2,206) | **Zero missed failures** |
+| **Visual Test Pre-Failure Warnings** | 90.43% (2,022/2,236) | **94.28%** (2,108/2,236) | **+3.85% (+86 episodes)** |
+| **Visual Test Missed Episodes** | 0.76% (17/2,236) | **0.00%** (0/2,236) | **Zero missed failures** |
 | **Visual Test Median Lead Time** | 0.132 s (4 frames) | **0.165 s** (5 frames) | Full 165 ms forward window |
-| **Motion Test Pre-Failure Warnings** | 79.33% (522/658) | **76.90%** (506/658) | Within statistical variance |
+| **Motion Test Pre-Failure Warnings** | 80.22% (519/647) | **76.35%** (494/647) | Maintained within statistical variance |
 
 ### 4. Ablation Analysis: Representation Learning vs. Calibration
-Ablation confirms that representation learning—not decision threshold adjustment—is essential:
-- Post-hoc threshold calibration (Model C) recovers only **2.74%** visual recall (from 48.94% to 51.68%).
-- Representation refinement (Model B) recovers **38.26%** visual recall.
-- **Attribution**: Representation learning accounts for **92.8%** of the observed sensitivity recovery.
+Ablation confirms that representation learning—not decision threshold adjustment—drives sensitivity recovery:
+- Post-hoc threshold calibration alone (Model C, $\theta^* = 0.46$) recovers only **+2.89%** visual recall (from 48.94% to 51.83%).
+- Representation refinement at fixed baseline threshold ($\theta = 0.50$, Model 3) recovers **+35.70%** visual recall (from 48.94% to 84.64%).
+- Full joint refinement (representation + locked $\theta^* = 0.37$, Model B) achieves **+38.26%** total visual recall recovery (to 87.20%).
+- **Attribution**: Representation learning accounts for **93.3%** of the observed sensitivity recovery ($+35.70\%$ out of $+38.26\%$ total gain).
 
 ---
 
 ## Visual Results
 
-### Figure 1: Performance Across Visual Degradation Regimes
-![R2 vs R3 Degradation](assets/results/fig2_performance_vs_degradation_level.png)
-*Figure 1: AUROC and AUPRC across the five optical degradation regimes (Nominal, Low, Transition, Medium, High). Even at severe High attenuation (α = 0.95), the model maintains AUROC > 0.78, proving that telemetry features retain predictive signal.*
+### Phase 1: Zero-Shot Transfer & Mechanism Analysis
 
-### Figure 2: Kinematic Decoupling Verification
-![Motion Distribution Comparison](assets/results/fig3_motion_distribution_comparison.png)
-*Figure 2: Empirical distribution of platform yaw rates in R2 aggressive test flights vs R3 benign degradation flights. The visual failure dataset operated at less than one-fourth the angular velocity of R2 (Cohen's d = 1.30), confirming clean kinematic decoupling.*
+#### Figure 1: Cross-Mechanism Generalization — R2 Motion Baseline vs R3 Visual Degradation
+![R2 vs R3 Performance](assets/results/fig1_r2_vs_r3_performance.png)
+*Figure 1: Pooled performance comparison between the R2 motion baseline (held-out test) and zero-shot transfer onto R3 visual degradation (40 flights, 30,545 frames). While discriminative AUROC (0.791) and precision (0.939) remain strong, frame-level recall drops to 0.496, identifying the conservative sensitivity boundary.*
 
-### Figure 3: Three-Way Model Comparison on Protected Test Sets
+#### Figure 2: Physical Degradation Response & Predictor Transfer Breakdown
+![Degradation Severity Breakdown](assets/results/fig2_performance_vs_degradation_level.png)
+*Figure 2: (A) Positive VO failure rate across the four discrete degradation severities (Nominal, Low, Medium, High). (B) Frozen predictor performance breakdown across severities. At Nominal and Low attenuation, the predictor retains discriminative ranking (AUROC 0.79 and 0.76). At High attenuation (α = 0.985), continuous 100% VO tracking failure renders AUROC mathematically undefined.*
+
+#### Figure 3: Kinematic Decoupling Verification — Vehicle Motion Comparison (R3 vs R2)
+![Kinematic Decoupling](assets/results/fig3_motion_distribution_comparison.png)
+*Figure 3: Kinematic decoupling verification. (A) Platform yaw rate distributions: R3 benign flights (mean 10.9°/s) decouple sharply from R2 aggressive flights (mean 61.1°/s). (B) Optical flow velocity magnitude separation. (C) Controlled cruise speeds across all 40 R3 trials. (D) Attitude tilt remaining well within the benign flight envelope (< 5°).*
+
+#### Figure 4: Pre-Failure Warning Dynamics Under Visual Observability Degradation
+![Early Warning Behavior](assets/results/fig4_early_warning_behavior.png)
+*Figure 4: (A) Warning timing distributions across all five degradation regimes, showing high true early warning rates (53.4% to 97.6%). (B) Pre-failure lead-time distribution for true early warnings, with a median lead time of 0.132 s (4 frames) compared to the R2 motion baseline of 0.165 s.*
+
+### Phase 2: Cross-Mechanism Representation Refinement
+
+#### Figure 5: Three-Way Model Comparison across Protected Test Partitions
 ![Three-Way Comparison](assets/results/refinement_fig1_three_way_comparison.png)
-*Figure 3: Comparison of Model A (Frozen R2), Model B (Refined MLP), and Model C (Threshold-Calibrated R2) on the protected visual and motion test sets. Model B dramatically recovers visual recall and F1 while maintaining motion AUROC and precision.*
+*Figure 5: Performance comparison across Model A (Frozen R2, θ = 0.50), Model B (Refined MLP, θ = 0.37), and Model C (Calibrated Frozen R2, θ = 0.46) on the protected Visual Test, Motion Test, and Combined Test partitions. Model B recovers visual recall from 48.94% to 87.20% while preserving motion AUROC (0.8014 vs 0.8046).*
 
-### Figure 4: Precision-Recall and ROC Curves
+#### Figure 6: Precision-Recall & ROC Discrimination Analysis
 ![PR and ROC Curves](assets/results/refinement_fig2_pr_roc_curves.png)
-*Figure 4: Receiver Operating Characteristic (ROC) and Precision-Recall (PR) curves across the protected test sets. Model B achieves AUROC = 0.9371 on the visual test distribution while matching the 0.8014 baseline on the motion test distribution.*
+*Figure 6: ROC and Precision-Recall curves across protected test sets. Visual Test AUROC increases from 0.792 to 0.937 (AUPRC from 0.860 to 0.968), while Motion Test AUROC is fully preserved at 0.801 (AUPRC 0.735 vs 0.726).*
 
-### Figure 5: Episode Early Warning Comparison
+#### Figure 7: Per-Flight Metric Shifts under Refinement
+![Per Flight Deltas](assets/results/refinement_fig3_per_flight_deltas.png)
+*Figure 7: Paired per-flight metric differences (Model B vs Model A). Large recall and F1 gains occur consistently across all 15 visual test trials, while motion test flights remain tightly centered near zero without regression.*
+
+#### Figure 8: Episode-Level Advance Warning & Safety Gate Outcomes
 ![Early Warning Comparison](assets/results/refinement_fig4_early_warning_comparison.png)
-*Figure 5: Advance warning lead-time distributions and outcome categories. Model B provides advance warnings on 94.28% of visually induced failure episodes with zero missed failures (0.00%) and a median lead time of 0.165 s.*
+*Figure 8: Episode outcome distributions on protected test sets. On the Visual Test set, Model B increases advance warning to 94.28% and completely eliminates missed failure episodes (0.0% missed vs 0.76% in Model A), providing a median warning lead time of 0.165 s.*
 
 ---
 
@@ -171,7 +188,7 @@ Ablation confirms that representation learning—not decision threshold adjustme
 
 1. **Rejection of Motion-Proxy Collapse ($H_2$)**:
    - The frozen R2 model did not degrade toward chance under benign vehicle dynamics, achieving **0.7906 AUROC** across 40 optical degradation flights ($p < 10^{-10}$ vs chance).
-   - This proves that optical flow velocity decay and keyframe transitions provide genuine physical precursors of tracking collapse independent of aggressive vehicle maneuvers.
+   - This demonstrates that optical flow velocity decay and keyframe transitions provide genuine empirical precursors associated with tracking collapse independent of aggressive vehicle maneuvers.
 2. **Identification of the Sensitivity Boundary**:
    - Absent violent platform rotations, the uncalibrated model operates with extreme precision (**93.88%**) but diminished frame-level recall (**49.58%**), warning ahead of extended failure runs but missing brief single-frame glitches.
 3. **Successful Targeted Refinement**:

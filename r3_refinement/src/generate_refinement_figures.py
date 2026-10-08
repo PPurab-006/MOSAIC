@@ -11,10 +11,11 @@ Outputs:
 
 import json
 from pathlib import Path
+import shutil
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.metrics import precision_recall_curve, roc_curve
+from sklearn.metrics import precision_recall_curve, roc_curve, roc_auc_score, average_precision_score
 
 plt.rcParams.update({
     "font.family": "serif",
@@ -35,6 +36,8 @@ REFINEMENT_DIR = R3_ROOT / "r3_refinement"
 METRICS_DIR = REFINEMENT_DIR / "results" / "metrics"
 FIG_DIR = REFINEMENT_DIR / "results" / "figures"
 FIG_DIR.mkdir(parents=True, exist_ok=True)
+ASSETS_DIR = R3_ROOT / "assets" / "results"
+ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
 METRICS_JSON = METRICS_DIR / "protected_evaluation_metrics.json"
 PER_FLIGHT_CSV = METRICS_DIR / "per_flight_comparison.csv"
@@ -49,7 +52,7 @@ DATASET_R3 = R3_ROOT / "data" / "processed" / "r3_dataset_k5.csv"
 
 def plot_fig1(metrics_data):
     """Figure 1: Three-way comparison across Visual Test, Motion Test, and Combined Test."""
-    fig, axes = plt.subplots(1, 3, figsize=(16, 5), sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=(16, 5.5), sharey=True)
 
     domains = [
         ("protected_r3_visual_test", "Visual Degradation Test (15 Trials)", axes[0]),
@@ -62,7 +65,7 @@ def plot_fig1(metrics_data):
     width = 0.25
 
     colors = ["#2b5c8f", "#d95f02", "#7570b3"]
-    labels = ["Model A (Frozen R2)", "Model B (Refined MLP)", "Model C (Calibrated Frozen R2)"]
+    labels = ["Model A (Frozen R2, θ=0.50)", "Model B (Refined MLP, θ=0.37)", "Model C (Calibrated Frozen R2, θ=0.46)"]
 
     for dom_key, title, ax in domains:
         d = metrics_data[dom_key]
@@ -70,25 +73,43 @@ def plot_fig1(metrics_data):
         mB = [d["model_b_refined_mlp"]["recall"], d["model_b_refined_mlp"]["precision"], d["model_b_refined_mlp"]["f1"], d["model_b_refined_mlp"]["auroc"]]
         mC = [d["model_c_calibrated_frozen_r2"]["recall"], d["model_c_calibrated_frozen_r2"]["precision"], d["model_c_calibrated_frozen_r2"]["f1"], d["model_c_calibrated_frozen_r2"]["auroc"]]
 
-        ax.bar(x - width, mA, width, label=labels[0], color=colors[0], alpha=0.9, edgecolor="black")
-        ax.bar(x, mB, width, label=labels[1], color=colors[1], alpha=0.9, edgecolor="black")
-        ax.bar(x + width, mC, width, label=labels[2], color=colors[2], alpha=0.9, edgecolor="black")
+        rects1 = ax.bar(x - width, mA, width, label=labels[0], color=colors[0], alpha=0.9, edgecolor="black")
+        rects2 = ax.bar(x, mB, width, label=labels[1], color=colors[1], alpha=0.9, edgecolor="black")
+        rects3 = ax.bar(x + width, mC, width, label=labels[2], color=colors[2], alpha=0.9, edgecolor="black")
 
-        ax.set_title(title, fontweight="bold")
+        for rect in rects1:
+            h = rect.get_height()
+            ax.annotate(f"{h:.2f}", xy=(rect.get_x() + rect.get_width() / 2, h), xytext=(0, 2),
+                        textcoords="offset points", ha="center", va="bottom", fontsize=8)
+        for rect in rects2:
+            h = rect.get_height()
+            ax.annotate(f"{h:.2f}", xy=(rect.get_x() + rect.get_width() / 2, h), xytext=(0, 2),
+                        textcoords="offset points", ha="center", va="bottom", fontsize=8, fontweight="bold")
+        for rect in rects3:
+            h = rect.get_height()
+            ax.annotate(f"{h:.2f}", xy=(rect.get_x() + rect.get_width() / 2, h), xytext=(0, 2),
+                        textcoords="offset points", ha="center", va="bottom", fontsize=8)
+
+        ax.set_title(title, fontweight="bold", pad=10)
         ax.set_xticks(x)
         ax.set_xticklabels(metrics)
-        ax.set_ylim(0, 1.05)
+        ax.set_ylim(0, 1.18)
         ax.grid(axis="y", linestyle="--", alpha=0.5)
         ax.axhline(0.5, color="gray", linestyle=":", linewidth=1)
 
-    axes[0].set_ylabel("Metric Score")
-    axes[0].legend(loc="lower right")
+    axes[0].set_ylabel("Metric Score [0, 1]")
+    
+    handles, _ = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 1.02), ncol=3,
+               framealpha=0.95, facecolor="white", edgecolor="#cccccc")
 
+    plt.suptitle("Refinement Figure 1: Cross-Mechanism Generalization Comparison across Test Cohorts", y=1.06, fontsize=13, fontweight="bold")
     plt.tight_layout()
     out_path = FIG_DIR / "refinement_fig1_three_way_comparison.png"
-    plt.savefig(out_path)
+    plt.savefig(out_path, bbox_inches="tight")
+    shutil.copy(out_path, ASSETS_DIR / out_path.name)
     plt.close()
-    print(f"-> Saved: {out_path}")
+    print(f"-> Saved: {out_path} and synced to {ASSETS_DIR / out_path.name}")
 
 
 def plot_fig2():
@@ -143,13 +164,24 @@ def plot_fig2():
         p_m_frozen = torch.sigmoid(model_r2(torch.tensor(scaler_r2.transform(X_m_raw), dtype=torch.float32))).numpy()
         p_m_ref = torch.sigmoid(model_ref(torch.tensor(scaler_ref.transform(X_m_raw), dtype=torch.float32))).numpy()
 
+    # Compute exact metrics dynamically from predictions
+    auc_v_f = roc_auc_score(y_v, p_v_frozen)
+    auc_v_r = roc_auc_score(y_v, p_v_ref)
+    ap_v_f = average_precision_score(y_v, p_v_frozen)
+    ap_v_r = average_precision_score(y_v, p_v_ref)
+
+    auc_m_f = roc_auc_score(y_m, p_m_frozen)
+    auc_m_r = roc_auc_score(y_m, p_m_ref)
+    ap_m_f = average_precision_score(y_m, p_m_frozen)
+    ap_m_r = average_precision_score(y_m, p_m_ref)
+
     fig, axes = plt.subplots(2, 2, figsize=(12, 10))
 
     # ROC Visual Test
     fpr_v_f, tpr_v_f, _ = roc_curve(y_v, p_v_frozen)
     fpr_v_r, tpr_v_r, _ = roc_curve(y_v, p_v_ref)
-    axes[0, 0].plot(fpr_v_f, tpr_v_f, label="Model A (Frozen R2): AUROC=0.792", color="#2b5c8f", linewidth=2)
-    axes[0, 0].plot(fpr_v_r, tpr_v_r, label="Model B (Refined MLP): AUROC=0.937", color="#d95f02", linewidth=2)
+    axes[0, 0].plot(fpr_v_f, tpr_v_f, label=f"Model A (Frozen R2): AUROC={auc_v_f:.3f}", color="#2b5c8f", linewidth=2)
+    axes[0, 0].plot(fpr_v_r, tpr_v_r, label=f"Model B (Refined MLP): AUROC={auc_v_r:.3f}", color="#d95f02", linewidth=2)
     axes[0, 0].plot([0, 1], [0, 1], "k--", alpha=0.5)
     axes[0, 0].set_title("ROC Curve — Visual Degradation Test", fontweight="bold")
     axes[0, 0].set_xlabel("False Positive Rate")
@@ -160,8 +192,8 @@ def plot_fig2():
     # PR Visual Test
     prec_v_f, rec_v_f, _ = precision_recall_curve(y_v, p_v_frozen)
     prec_v_r, rec_v_r, _ = precision_recall_curve(y_v, p_v_ref)
-    axes[0, 1].plot(rec_v_f, prec_v_f, label="Model A (Frozen R2): AUPRC=0.860", color="#2b5c8f", linewidth=2)
-    axes[0, 1].plot(rec_v_r, prec_v_r, label="Model B (Refined MLP): AUPRC=0.966", color="#d95f02", linewidth=2)
+    axes[0, 1].plot(rec_v_f, prec_v_f, label=f"Model A (Frozen R2): AUPRC={ap_v_f:.3f}", color="#2b5c8f", linewidth=2)
+    axes[0, 1].plot(rec_v_r, prec_v_r, label=f"Model B (Refined MLP): AUPRC={ap_v_r:.3f}", color="#d95f02", linewidth=2)
     axes[0, 1].set_title("Precision-Recall — Visual Degradation Test", fontweight="bold")
     axes[0, 1].set_xlabel("Recall")
     axes[0, 1].set_ylabel("Precision")
@@ -171,8 +203,8 @@ def plot_fig2():
     # ROC Motion Test
     fpr_m_f, tpr_m_f, _ = roc_curve(y_m, p_m_frozen)
     fpr_m_r, tpr_m_r, _ = roc_curve(y_m, p_m_ref)
-    axes[1, 0].plot(fpr_m_f, tpr_m_f, label="Model A (Frozen R2): AUROC=0.805", color="#2b5c8f", linewidth=2)
-    axes[1, 0].plot(fpr_m_r, tpr_m_r, label="Model B (Refined MLP): AUROC=0.801", color="#d95f02", linewidth=2)
+    axes[1, 0].plot(fpr_m_f, tpr_m_f, label=f"Model A (Frozen R2): AUROC={auc_m_f:.3f}", color="#2b5c8f", linewidth=2)
+    axes[1, 0].plot(fpr_m_r, tpr_m_r, label=f"Model B (Refined MLP): AUROC={auc_m_r:.3f}", color="#d95f02", linewidth=2)
     axes[1, 0].plot([0, 1], [0, 1], "k--", alpha=0.5)
     axes[1, 0].set_title("ROC Curve — Motion-Induced Test", fontweight="bold")
     axes[1, 0].set_xlabel("False Positive Rate")
@@ -183,19 +215,21 @@ def plot_fig2():
     # PR Motion Test
     prec_m_f, rec_m_f, _ = precision_recall_curve(y_m, p_m_frozen)
     prec_m_r, rec_m_r, _ = precision_recall_curve(y_m, p_m_ref)
-    axes[1, 1].plot(rec_m_f, prec_m_f, label="Model A (Frozen R2): AUPRC=0.726", color="#2b5c8f", linewidth=2)
-    axes[1, 1].plot(rec_m_r, prec_m_r, label="Model B (Refined MLP): AUPRC=0.721", color="#d95f02", linewidth=2)
+    axes[1, 1].plot(rec_m_f, prec_m_f, label=f"Model A (Frozen R2): AUPRC={ap_m_f:.3f}", color="#2b5c8f", linewidth=2)
+    axes[1, 1].plot(rec_m_r, prec_m_r, label=f"Model B (Refined MLP): AUPRC={ap_m_r:.3f}", color="#d95f02", linewidth=2)
     axes[1, 1].set_title("Precision-Recall — Motion-Induced Test", fontweight="bold")
     axes[1, 1].set_xlabel("Recall")
     axes[1, 1].set_ylabel("Precision")
     axes[1, 1].legend(loc="lower left")
     axes[1, 1].grid(True, linestyle="--", alpha=0.5)
 
+    plt.suptitle("Refinement Figure 2: Precision-Recall & ROC Discrimination Analysis", y=1.01, fontsize=13, fontweight="bold")
     plt.tight_layout()
     out_path = FIG_DIR / "refinement_fig2_pr_roc_curves.png"
-    plt.savefig(out_path)
+    plt.savefig(out_path, bbox_inches="tight")
+    shutil.copy(out_path, ASSETS_DIR / out_path.name)
     plt.close()
-    print(f"-> Saved: {out_path}")
+    print(f"-> Saved: {out_path} and synced to {ASSETS_DIR / out_path.name}")
 
 
 def plot_fig3():
@@ -217,7 +251,7 @@ def plot_fig3():
     axes[0].axhline(0, color="black", linestyle="-", linewidth=1)
     axes[0].set_title("Visual Degradation Test Trials (N=15)\nModel B vs Model A", fontweight="bold")
     axes[0].set_xlabel("Test Trial Index")
-    axes[0].set_ylabel("Performance Delta (%)")
+    axes[0].set_ylabel("Performance Delta (Percentage Points)")
     axes[0].set_xticks(x_v)
     axes[0].set_xticklabels([f"T{i+1}" for i in range(len(df_v))])
     axes[0].legend(loc="upper left")
@@ -233,26 +267,28 @@ def plot_fig3():
     axes[1].axhline(0, color="black", linestyle="-", linewidth=1)
     axes[1].set_title("Motion-Induced Test Flights (N=14)\nModel B vs Model A", fontweight="bold")
     axes[1].set_xlabel("Test Flight Index")
-    axes[1].set_ylabel("Performance Delta (%)")
+    axes[1].set_ylabel("Performance Delta (Percentage Points)")
     axes[1].set_xticks(x_m)
     axes[1].set_xticklabels([f"F{i+1}" for i in range(len(df_m))])
     axes[1].legend(loc="upper left")
     axes[1].grid(axis="y", linestyle="--", alpha=0.5)
 
+    plt.suptitle("Refinement Figure 3: Per-Flight Metric Shifts (Model B vs Model A)", y=1.01, fontsize=13, fontweight="bold")
     plt.tight_layout()
     out_path = FIG_DIR / "refinement_fig3_per_flight_deltas.png"
-    plt.savefig(out_path)
+    plt.savefig(out_path, bbox_inches="tight")
+    shutil.copy(out_path, ASSETS_DIR / out_path.name)
     plt.close()
-    print(f"-> Saved: {out_path}")
+    print(f"-> Saved: {out_path} and synced to {ASSETS_DIR / out_path.name}")
 
 
 def plot_fig4(episodes_data):
     """Figure 4: Episode-level early warning rate and missed failure comparison."""
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5.5))
 
     domains = [
-        ("protected_r3_visual_test", "Visual Degradation Test", axes[0]),
-        ("protected_r2_motion_test", "Motion-Induced Test", axes[1]),
+        ("protected_r3_visual_test", "Visual Degradation Test (N=2,236 Episodes)", axes[0]),
+        ("protected_r2_motion_test", "Motion-Induced Test (N=647 Episodes)", axes[1]),
     ]
 
     models = ["Model A (Frozen R2)", "Model B (Refined MLP)", "Model C (Calibrated Frozen)"]
@@ -265,27 +301,37 @@ def plot_fig4(episodes_data):
         post_rates = [d[k]["post_rate_pct"] for k in keys]
 
         x = np.arange(len(models))
-        width = 0.55
+        width = 0.52
 
         ax.bar(x, early_rates, width, label="Early Warning (< t_onset)", color="#2ca02c", alpha=0.85, edgecolor="black")
         ax.bar(x, post_rates, width, bottom=early_rates, label="Post-Onset Detection", color="#ff7f0e", alpha=0.85, edgecolor="black")
         bottom_miss = [e + p for e, p in zip(early_rates, post_rates)]
         ax.bar(x, missed_rates, width, bottom=bottom_miss, label="Missed Episode", color="#d62728", alpha=0.85, edgecolor="black")
 
-        ax.set_title(title, fontweight="bold")
+        for i, ew in enumerate(early_rates):
+            ax.annotate(f"{ew:.1f}%", xy=(x[i], ew / 2),
+                        ha="center", va="center", color="white", fontsize=9.5, fontweight="bold")
+
+        ax.set_title(title, fontweight="bold", pad=10)
         ax.set_xticks(x)
-        ax.set_xticklabels(["Model A\n(Frozen)", "Model B\n(Refined)", "Model C\n(Calibrated)"])
-        ax.set_ylim(0, 105)
+        ax.set_xticklabels(["Model A\n(Frozen, θ=0.50)", "Model B\n(Refined, θ=0.37)", "Model C\n(Calibrated, θ=0.46)"])
+        ax.set_ylim(0, 114)
         ax.set_ylabel("Episode Outcome Distribution (%)")
         ax.grid(axis="y", linestyle="--", alpha=0.5)
 
-    axes[0].legend(loc="lower left")
+    axes[0].text(0.04, 0.93, "Model B Visual Missed: 0.0% (0/2,236)", transform=axes[0].transAxes,
+                 fontsize=8.5, fontweight="bold", color="#1b7837",
+                 bbox=dict(boxstyle="round,pad=0.3", fc="#e5f5e0", ec="#31a354", lw=0.8))
+    axes[0].legend(loc="upper right", framealpha=0.9)
+    axes[1].legend(loc="upper right", framealpha=0.9)
 
+    plt.suptitle("Refinement Figure 4: Episode-Level Advance Warning & Safety Gate Outcomes", y=1.01, fontsize=13, fontweight="bold")
     plt.tight_layout()
     out_path = FIG_DIR / "refinement_fig4_early_warning_comparison.png"
-    plt.savefig(out_path)
+    plt.savefig(out_path, bbox_inches="tight")
+    shutil.copy(out_path, ASSETS_DIR / out_path.name)
     plt.close()
-    print(f"-> Saved: {out_path}")
+    print(f"-> Saved: {out_path} and synced to {ASSETS_DIR / out_path.name}")
 
 
 def main():

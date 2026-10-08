@@ -34,10 +34,14 @@ plt.rcParams.update({
     "savefig.bbox": "tight",
 })
 
+import shutil
+
 R3_ROOT = Path(__file__).resolve().parent.parent
 PROCESSED_DIR = R3_ROOT / "data" / "processed"
 FIGURES_DIR = R3_ROOT / "figures"
+ASSETS_DIR = R3_ROOT / "assets" / "results"
 FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
 DATASET_PATH = PROCESSED_DIR / "r3_dataset_k5.csv"
 METRICS_JSON_PATH = PROCESSED_DIR / "r3_frozen_r2_evaluation_metrics.json"
@@ -75,13 +79,18 @@ def plot_fig1_r2_vs_r3(metrics_data, stats_data):
         stats_data["verdict_details"]["r3_early_warning_rate_pct"] / 100.0,
     ]
 
+    # Analytical 95% binomial confidence interval for episode-level early warning rate (N=5,964)
+    ew_rate = r3_vals[5]
+    n_episodes = 5964
+    binom_err = 1.96 * np.sqrt(ew_rate * (1.0 - ew_rate) / n_episodes)
+
     r3_err_low = [
         r3_vals[0] - ci["auroc"]["ci_95_lower"],
         r3_vals[1] - ci["auprc"]["ci_95_lower"],
         r3_vals[2] - ci["f1"]["ci_95_lower"],
         r3_vals[3] - ci["precision"]["ci_95_lower"],
         r3_vals[4] - ci["recall"]["ci_95_lower"],
-        0.02,
+        binom_err,
     ]
     r3_err_high = [
         ci["auroc"]["ci_95_upper"] - r3_vals[0],
@@ -89,13 +98,13 @@ def plot_fig1_r2_vs_r3(metrics_data, stats_data):
         ci["f1"]["ci_95_upper"] - r3_vals[2],
         ci["precision"]["ci_95_upper"] - r3_vals[3],
         ci["recall"]["ci_95_upper"] - r3_vals[4],
-        0.02,
+        binom_err,
     ]
 
     x = np.arange(len(metrics))
     width = 0.35
 
-    fig, ax = plt.subplots(figsize=(10, 5.5))
+    fig, ax = plt.subplots(figsize=(10.5, 5.8))
     rects1 = ax.bar(x - width / 2, r2_vals, width, label="R2 Motion-Induced Baseline (Held-Out Test)", color="#2b5c8f", alpha=0.9, edgecolor="black")
     rects2 = ax.bar(x + width / 2, r3_vals, width, yerr=[r3_err_low, r3_err_high], capsize=4,
                     label="R3 Visual-Degradation Transfer (Frozen Predictor)", color="#e07a5f", alpha=0.9, edgecolor="black")
@@ -103,11 +112,11 @@ def plot_fig1_r2_vs_r3(metrics_data, stats_data):
     ax.set_ylabel("Score / Rate [0, 1]")
     ax.set_title("Figure 1: Cross-Mechanism Generalization — R2 Motion Baseline vs R3 Visual Degradation", pad=15)
     ax.set_xticks(x)
-    ax.set_xticklabels(metrics, rotation=15, ha="right")
-    ax.set_ylim(0, 1.1)
+    ax.set_xticklabels(metrics, rotation=12, ha="right")
+    ax.set_ylim(0, 1.22)
     ax.axhline(0.5, color="gray", linestyle="--", alpha=0.7, label="Chance Level (AUROC=0.5)")
     ax.grid(axis="y", linestyle=":", alpha=0.6)
-    ax.legend(loc="upper right", framealpha=0.9)
+    ax.legend(loc="upper right", framealpha=0.95, facecolor="white", edgecolor="#cccccc")
 
     # Value labels
     for rect in rects1:
@@ -119,11 +128,15 @@ def plot_fig1_r2_vs_r3(metrics_data, stats_data):
         ax.annotate(f"{h:.3f}", xy=(rect.get_x() + rect.get_width() / 2, h), xytext=(0, 3),
                     textcoords="offset points", ha="center", va="bottom", fontsize=8.5, fontweight="bold")
 
+    ax.text(0.02, 0.94, "*Error bars: 95% bootstrap CIs (frame metrics); 95% binomial CI (episodes, N=5,964)",
+            transform=ax.transAxes, fontsize=8.5, color="#555555", style="italic")
+
     plt.tight_layout()
     out_path = FIGURES_DIR / "fig1_r2_vs_r3_performance.png"
     plt.savefig(out_path)
+    shutil.copy(out_path, ASSETS_DIR / out_path.name)
     plt.close()
-    print(f"-> Saved: {out_path}")
+    print(f"-> Saved: {out_path} and synced to {ASSETS_DIR / out_path.name}")
 
 
 def plot_fig2_degradation_severity(metrics_data):
@@ -133,46 +146,60 @@ def plot_fig2_degradation_severity(metrics_data):
 
     alpha_labels = ["Nominal\n(α=0.000)", "Low\n(α=0.920)", "Medium\n(α=0.960)", "High\n(α=0.985)"]
     fail_rates = [reg_data[r]["positive_rate_pct"] for r in regimes]
-    aurocs = [reg_data[r]["auroc"] if not np.isnan(reg_data[r]["auroc"]) else 0.5 for r in regimes]
     f1s = [reg_data[r]["f1"] for r in regimes]
     recalls = [reg_data[r]["recall"] for r in regimes]
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5.2))
 
     # Panel A: Failure Rate vs Severity
     ax1.plot(alpha_labels, fail_rates, marker="o", color="#d62828", linewidth=2.5, markersize=8, label="VO Failure Rate (K=5)")
     ax1.axhline(34.62, color="blue", linestyle="--", alpha=0.7, label="R2 Test Base Rate (34.6%)")
     ax1.set_ylabel("Positive Failure Label Rate (%)")
     ax1.set_title("(A) VO Failure Rate vs Degradation Severity")
-    ax1.set_ylim(-2, 105)
+    ax1.set_ylim(-2, 114)
     ax1.grid(True, linestyle=":", alpha=0.6)
     ax1.legend(loc="upper left")
 
     for x_idx, y_val in enumerate(fail_rates):
-        ax1.annotate(f"{y_val:.1f}%", xy=(x_idx, y_val), xytext=(0, 8),
+        ax1.annotate(f"{y_val:.1f}%", xy=(x_idx, y_val), xytext=(0, 6),
                      textcoords="offset points", ha="center", va="bottom", fontsize=9, fontweight="bold")
 
     # Panel B: Predictor Metrics vs Severity
-    ax2.plot(alpha_labels, aurocs, marker="s", color="#1d3557", linewidth=2.2, markersize=7, label="AUROC")
-    ax2.plot(alpha_labels, f1s, marker="^", color="#2a9d8f", linewidth=2.2, markersize=7, label="F1 Score")
-    ax2.plot(alpha_labels, recalls, marker="d", color="#e76f51", linewidth=2.2, markersize=7, label="Recall")
+    # AUROC is well-defined for Nominal, Low, Medium; undefined for High (100% positive, 0 negative)
+    auroc_x = [0, 1, 2]
+    auroc_y = [reg_data["NOMINAL"]["auroc"], reg_data["LOW"]["auroc"], reg_data["MEDIUM"]["auroc"]]
+    ax2.plot(auroc_x, auroc_y, marker="s", color="#1d3557", linewidth=2.2, markersize=7, label="AUROC")
+    ax2.plot(range(len(regimes)), f1s, marker="^", color="#2a9d8f", linewidth=2.2, markersize=7, label="F1 Score")
+    ax2.plot(range(len(regimes)), recalls, marker="d", color="#e76f51", linewidth=2.2, markersize=7, label="Recall")
+
+    # Highlight High AUROC undefined status
+    ax2.plot([3], [0.5], marker="x", color="#1d3557", markersize=8, markeredgewidth=2)
+    ax2.annotate("N/A*\n(100% Pos)", xy=(3, 0.5), xytext=(0, 8),
+                 textcoords="offset points", ha="center", fontsize=8.5, color="#1d3557", fontweight="bold")
+
     ax2.axhline(0.5, color="gray", linestyle="--", alpha=0.7, label="Chance Level (0.5)")
+    ax2.set_xticks(range(len(regimes)))
+    ax2.set_xticklabels(alpha_labels)
     ax2.set_ylabel("Score [0, 1]")
     ax2.set_title("(B) Frozen R2 Performance vs Degradation Severity")
-    ax2.set_ylim(0.0, 1.05)
+    ax2.set_ylim(0.0, 1.12)
     ax2.grid(True, linestyle=":", alpha=0.6)
-    ax2.legend(loc="lower left")
+    ax2.legend(loc="lower left", framealpha=0.9)
 
-    for x_idx, y_val in enumerate(aurocs):
+    for x_idx, y_val in zip(auroc_x, auroc_y):
         ax2.annotate(f"{y_val:.2f}", xy=(x_idx, y_val), xytext=(0, 6),
                      textcoords="offset points", ha="center", va="bottom", fontsize=9)
+
+    ax2.text(0.38, 0.04, "*AUROC undefined at High (0 negative samples)",
+             transform=ax2.transAxes, fontsize=8, color="#555555")
 
     plt.suptitle("Figure 2: Physical Degradation Response & Predictor Transfer Breakdown", y=1.02)
     plt.tight_layout()
     out_path = FIGURES_DIR / "fig2_performance_vs_degradation_level.png"
     plt.savefig(out_path)
+    shutil.copy(out_path, ASSETS_DIR / out_path.name)
     plt.close()
-    print(f"-> Saved: {out_path}")
+    print(f"-> Saved: {out_path} and synced to {ASSETS_DIR / out_path.name}")
 
 
 def plot_fig3_motion_distributions():
@@ -230,30 +257,33 @@ def plot_fig3_motion_distributions():
     # Panel D: R3 Attitude Tilt Distribution
     tilts = df_motion["gt_tilt_mean"].values
     ax4.bar(range(len(tilts)), tilts, color="#e07a5f", alpha=0.85, edgecolor="black")
-    ax4.axhline(45.0, color="darkred", linestyle=":", label="Hard Safety Gate Tilt Limit (45°)")
+    ax4.axhline(45.0, color="darkred", linestyle=":", linewidth=1.8, label="Hard Safety Gate Tilt Limit (45°)")
+    ax4.axhspan(0, 10, color="green", alpha=0.08, label="Benign Flight Envelope (<10°)")
     ax4.set_xlabel("R3 Experimental Trials")
     ax4.set_ylabel("Mean Attitude Tilt θ_tilt [deg]")
     ax4.set_title("(D) R3 Attitude Tilt per Flight (Benign < 5°)")
-    ax4.set_ylim(0, 15)
+    ax4.set_ylim(0, 50)
     ax4.legend(loc="upper right", fontsize=8.5)
     ax4.grid(axis="y", linestyle=":", alpha=0.5)
 
-    plt.suptitle("Figure 3: Empirical Demonstration of Complete Motion Isolation (R3 vs R2)", y=1.01)
+    plt.suptitle("Figure 3: Kinematic Decoupling Verification — Vehicle Motion Comparison (R3 vs R2)", y=1.01)
     plt.tight_layout()
     out_path = FIGURES_DIR / "fig3_motion_distribution_comparison.png"
     plt.savefig(out_path)
+    shutil.copy(out_path, ASSETS_DIR / out_path.name)
     plt.close()
-    print(f"-> Saved: {out_path}")
+    print(f"-> Saved: {out_path} and synced to {ASSETS_DIR / out_path.name}")
 
 
 def plot_fig4_early_warnings(warnings_data):
     """Figure 4: Early-Warning Dynamics & Temporal Behavior."""
     df_ep = pd.read_csv(EPISODES_CSV_PATH)
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5.2))
 
-    # Panel A: Outcome Proportions by Regime
-    regimes = ["LOW", "MEDIUM", "HIGH", "TRANSITION"]
+    # Panel A: Outcome Proportions across all 5 regimes
+    regimes = ["NOMINAL", "LOW", "TRANSITION", "MEDIUM", "HIGH"]
+    reg_labels = ["Nominal\n(α=0.00)", "Low\n(α=0.92)", "Transition\n(0.0→0.98)", "Medium\n(α=0.96)", "High\n(α=0.985)"]
     early_pcts = [warnings_data["regime_breakdown"][r]["early_warning_rate_pct"] for r in regimes]
     post_pcts = [warnings_data["regime_breakdown"][r]["post_detection_rate_pct"] for r in regimes]
     miss_pcts = [warnings_data["regime_breakdown"][r]["missed_failure_rate_pct"] for r in regimes]
@@ -266,11 +296,16 @@ def plot_fig4_early_warnings(warnings_data):
     bottom_miss = [e + p for e, p in zip(early_pcts, post_pcts)]
     p3 = ax1.bar(x, miss_pcts, width, bottom=bottom_miss, label="Missed Failure", color="#e76f51", edgecolor="black")
 
+    # Annotate early warning percentage on each bar
+    for i, ew_val in enumerate(early_pcts):
+        ax1.annotate(f"{ew_val:.1f}%", xy=(x[i], ew_val / 2),
+                     ha="center", va="center", color="white", fontsize=9, fontweight="bold")
+
     ax1.set_ylabel("Proportion of Episodes (%)")
     ax1.set_title("(A) Warning Timing Distribution by Degradation Regime")
     ax1.set_xticks(x)
-    ax1.set_xticklabels(regimes)
-    ax1.set_ylim(0, 100)
+    ax1.set_xticklabels(reg_labels)
+    ax1.set_ylim(0, 105)
     ax1.legend(loc="upper right", framealpha=0.9)
     ax1.grid(axis="y", linestyle=":", alpha=0.5)
 
@@ -290,8 +325,9 @@ def plot_fig4_early_warnings(warnings_data):
     plt.tight_layout()
     out_path = FIGURES_DIR / "fig4_early_warning_behavior.png"
     plt.savefig(out_path)
+    shutil.copy(out_path, ASSETS_DIR / out_path.name)
     plt.close()
-    print(f"-> Saved: {out_path}")
+    print(f"-> Saved: {out_path} and synced to {ASSETS_DIR / out_path.name}")
 
 
 def main():
