@@ -1,0 +1,657 @@
+{
+  "experiment": "Research 3 (MOSAIC) \u2014 V2 Leakage-Free Experiment",
+  "protocol": "docs/V2_PROTOCOL.md",
+  "label_specification": "Strict: y_t = max(F_{t+1}..F_{t+5}), F_t=1 purged, boundary drops 5/5",
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "models": {
+    "frozen_r2": {
+      "strict_visual_auroc": 0.6545,
+      "strict_visual_f1": 0.2455,
+      "motion_auroc": 0.7665,
+      "within_regime_auroc_range": [
+        0.2724,
+        0.7661
+      ]
+    },
+    "model_a_15_features": {
+      "strict_visual_auroc_mean": 0.8798,
+      "strict_visual_auroc_std": 0.0057,
+      "strict_visual_f1_mean": 0.8056,
+      "motion_auroc_mean": 0.7557,
+      "motion_auroc_std": 0.0053,
+      "within_regime_auroc_range": [
+        0.6169,
+        0.9279
+      ]
+    },
+    "model_b_35_features": {
+      "strict_visual_auroc_mean": 0.9345,
+      "strict_visual_auroc_std": 0.0014,
+      "strict_visual_f1_mean": 0.862,
+      "motion_auroc_mean": 0.7749,
+      "motion_auroc_std": 0.0052,
+      "within_regime_auroc_range": [
+        0.6816,
+        0.969
+      ]
+    }
+  },
+  "per_regime_auroc": [
+    {
+      "regime": "NOMINAL",
+      "samples": 2231,
+      "positives": 245,
+      "frozen_r2_auroc": 0.7661,
+      "model_a_auroc": 0.7356,
+      "model_b_auroc": 0.7473
+    },
+    {
+      "regime": "LOW",
+      "samples": 2137,
+      "positives": 645,
+      "frozen_r2_auroc": 0.6935,
+      "model_a_auroc": 0.6711,
+      "model_b_auroc": 0.6816
+    },
+    {
+      "regime": "TRANSITION",
+      "samples": 1665,
+      "positives": 823,
+      "frozen_r2_auroc": 0.4711,
+      "model_a_auroc": 0.9279,
+      "model_b_auroc": 0.969
+    },
+    {
+      "regime": "MEDIUM",
+      "samples": 1546,
+      "positives": 1458,
+      "frozen_r2_auroc": 0.2724,
+      "model_a_auroc": 0.6169,
+      "model_b_auroc": 0.7159
+    }
+  ],
+  "paired_differences": [
+    {
+      "comparison": "diff_b_minus_a",
+      "metric": "r3_auroc",
+      "mean_diff": 0.0507,
+      "ci_lower_2.5": 0.0326,
+      "ci_upper_97.5": 0.0711
+    },
+    {
+      "comparison": "diff_b_minus_a",
+      "metric": "r3_auprc",
+      "mean_diff": 0.0429,
+      "ci_lower_2.5": 0.0196,
+      "ci_upper_97.5": 0.0748
+    },
+    {
+      "comparison": "diff_b_minus_a",
+      "metric": "r3_f1",
+      "mean_diff": 0.0554,
+      "ci_lower_2.5": 0.0339,
+      "ci_upper_97.5": 0.0794
+    },
+    {
+      "comparison": "diff_b_minus_a",
+      "metric": "r3_prec",
+      "mean_diff": 0.0269,
+      "ci_lower_2.5": -0.0078,
+      "ci_upper_97.5": 0.0704
+    },
+    {
+      "comparison": "diff_b_minus_a",
+      "metric": "r3_rec",
+      "mean_diff": 0.0801,
+      "ci_lower_2.5": 0.0424,
+      "ci_upper_97.5": 0.1212
+    },
+    {
+      "comparison": "diff_b_minus_a",
+      "metric": "r2_auroc",
+      "mean_diff": 0.02,
+      "ci_lower_2.5": 0.0035,
+      "ci_upper_97.5": 0.0422
+    },
+    {
+      "comparison": "diff_a_minus_f",
+      "metric": "r3_auroc",
+      "mean_diff": 0.226,
+      "ci_lower_2.5": 0.1259,
+      "ci_upper_97.5": 0.3336
+    },
+    {
+      "comparison": "diff_a_minus_f",
+      "metric": "r3_auprc",
+      "mean_diff": 0.2624,
+      "ci_lower_2.5": 0.1623,
+      "ci_upper_97.5": 0.3594
+    },
+    {
+      "comparison": "diff_a_minus_f",
+      "metric": "r3_f1",
+      "mean_diff": 0.5556,
+      "ci_lower_2.5": 0.3939,
+      "ci_upper_97.5": 0.6777
+    },
+    {
+      "comparison": "diff_a_minus_f",
+      "metric": "r3_prec",
+      "mean_diff": 0.1428,
+      "ci_lower_2.5": 0.0341,
+      "ci_upper_97.5": 0.2451
+    },
+    {
+      "comparison": "diff_a_minus_f",
+      "metric": "r3_rec",
+      "mean_diff": 0.6151,
+      "ci_lower_2.5": 0.4437,
+      "ci_upper_97.5": 0.7439
+    },
+    {
+      "comparison": "diff_a_minus_f",
+      "metric": "r2_auroc",
+      "mean_diff": -0.0054,
+      "ci_lower_2.5": -0.0192,
+      "ci_upper_97.5": 0.0076
+    },
+    {
+      "comparison": "diff_b_minus_f",
+      "metric": "r3_auroc",
+      "mean_diff": 0.2768,
+      "ci_lower_2.5": 0.1784,
+      "ci_upper_97.5": 0.3768
+    },
+    {
+      "comparison": "diff_b_minus_f",
+      "metric": "r3_auprc",
+      "mean_diff": 0.3053,
+      "ci_lower_2.5": 0.1919,
+      "ci_upper_97.5": 0.4078
+    },
+    {
+      "comparison": "diff_b_minus_f",
+      "metric": "r3_f1",
+      "mean_diff": 0.611,
+      "ci_lower_2.5": 0.4699,
+      "ci_upper_97.5": 0.723
+    },
+    {
+      "comparison": "diff_b_minus_f",
+      "metric": "r3_prec",
+      "mean_diff": 0.1697,
+      "ci_lower_2.5": 0.0413,
+      "ci_upper_97.5": 0.3025
+    },
+    {
+      "comparison": "diff_b_minus_f",
+      "metric": "r3_rec",
+      "mean_diff": 0.6952,
+      "ci_lower_2.5": 0.5554,
+      "ci_upper_97.5": 0.811
+    },
+    {
+      "comparison": "diff_b_minus_f",
+      "metric": "r2_auroc",
+      "mean_diff": 0.0146,
+      "ci_lower_2.5": 0.0009,
+      "ci_upper_97.5": 0.0312
+    }
+  ],
+  "baselines_c_and_d": [
+    {
+      "model": "Frozen R2 Baseline",
+      "pooled_visual_auroc": 0.6545,
+      "nominal_auroc": 0.7661,
+      "low_auroc": 0.6935,
+      "transition_auroc": 0.4711,
+      "medium_auroc": 0.2724,
+      "high_auroc": "Undefined",
+      "motion_auroc": 0.7665
+    },
+    {
+      "model": "Model A (15 Motion Features)",
+      "pooled_visual_auroc": 0.8838,
+      "nominal_auroc": 0.7356,
+      "low_auroc": 0.6711,
+      "transition_auroc": 0.9279,
+      "medium_auroc": 0.6169,
+      "high_auroc": "Undefined",
+      "motion_auroc": 0.7605
+    },
+    {
+      "model": "Model B (35 Features: Motion + Image)",
+      "pooled_visual_auroc": 0.9365,
+      "nominal_auroc": 0.7473,
+      "low_auroc": 0.6816,
+      "transition_auroc": 0.969,
+      "medium_auroc": 0.7159,
+      "high_auroc": "Undefined",
+      "motion_auroc": 0.7808
+    },
+    {
+      "model": "Baseline C (MLP: 20 Image Features Only)",
+      "pooled_visual_auroc": 0.9097,
+      "nominal_auroc": 0.6144,
+      "low_auroc": 0.5187,
+      "transition_auroc": 0.9655,
+      "medium_auroc": 0.4835,
+      "high_auroc": "Undefined",
+      "motion_auroc": 0.6571
+    },
+    {
+      "model": "Baseline C (LogReg: 20 Image Features Only)",
+      "pooled_visual_auroc": 0.8905,
+      "nominal_auroc": 0.4856,
+      "low_auroc": 0.4766,
+      "transition_auroc": 0.8907,
+      "medium_auroc": 0.4109,
+      "high_auroc": "Undefined",
+      "motion_auroc": 0.5469
+    },
+    {
+      "model": "Baseline D (MLP: Regime ID + Alpha)",
+      "pooled_visual_auroc": 0.9035,
+      "nominal_auroc": 0.5,
+      "low_auroc": 0.5,
+      "transition_auroc": 0.9414,
+      "medium_auroc": 0.5,
+      "high_auroc": "Undefined",
+      "motion_auroc": 0.5
+    },
+    {
+      "model": "Baseline D (LogReg: Regime ID + Alpha)",
+      "pooled_visual_auroc": 0.8826,
+      "nominal_auroc": 0.5,
+      "low_auroc": 0.5,
+      "transition_auroc": 0.9,
+      "medium_auroc": 0.5,
+      "high_auroc": "Undefined",
+      "motion_auroc": 0.5
+    }
+  ],
+  "transition_ramp_ablation": {
+    "model_b_transition_auroc": 0.969,
+    "model_b_time_transition_auroc": 0.9664,
+    "frame_idx_only_auroc": 0.8751,
+    "alpha_only_auroc": 0.9,
+    "conclusion": "Model B's near-perfect transition ranking is driven by optical contrast attenuation; adding explicit time/frame_idx does not alter ranking performance."
+  },
+  "reconciled_master_comparison": [
+    {
+      "model": "Frozen R2 Baseline",
+      "pooled_visual_auroc_mean_std": "0.6545 \u00b1 0.0000",
+      "pooled_visual_per_flight_range_n3": "0.6545 [0.6383, 0.6671]",
+      "nominal_per_flight_range_n3": "0.7661 [0.7420, 0.7886]",
+      "low_per_flight_range_n3": "0.6935 [0.5814, 0.7676]",
+      "transition_per_flight_range_n3": "0.4711 [0.4561, 0.4787]",
+      "medium_per_flight_range_n3": "0.2724 [0.1025, 0.4022]",
+      "high_per_flight_range_n3": "Undefined (single-class)",
+      "motion_auroc_mean_std": "0.7665 \u00b1 0.0000",
+      "motion_flight_cluster_ci_n14": "0.7665 [0.7169, 0.8054]"
+    },
+    {
+      "model": "Model A (15 Motion Features)",
+      "pooled_visual_auroc_mean_std": "0.8798 \u00b1 0.0057",
+      "pooled_visual_per_flight_range_n3": "0.8838 [0.8766, 0.8978]",
+      "nominal_per_flight_range_n3": "0.7356 [0.6919, 0.7917]",
+      "low_per_flight_range_n3": "0.6711 [0.5756, 0.7332]",
+      "transition_per_flight_range_n3": "0.9279 [0.9217, 0.9389]",
+      "medium_per_flight_range_n3": "0.6169 [0.5634, 0.7072]",
+      "high_per_flight_range_n3": "Undefined (single-class)",
+      "motion_auroc_mean_std": "0.7556 \u00b1 0.0053",
+      "motion_flight_cluster_ci_n14": "0.7605 [0.7151, 0.7964]"
+    },
+    {
+      "model": "Model B (35 Features: Motion + Image)",
+      "pooled_visual_auroc_mean_std": "0.9345 \u00b1 0.0014",
+      "pooled_visual_per_flight_range_n3": "0.9365 [0.9326, 0.9411]",
+      "nominal_per_flight_range_n3": "0.7473 [0.7205, 0.7786]",
+      "low_per_flight_range_n3": "0.6816 [0.5956, 0.7270]",
+      "transition_per_flight_range_n3": "0.9690 [0.9656, 0.9729]",
+      "medium_per_flight_range_n3": "0.7159 [0.6996, 0.7452]",
+      "high_per_flight_range_n3": "Undefined (single-class)",
+      "motion_auroc_mean_std": "0.7749 \u00b1 0.0052",
+      "motion_flight_cluster_ci_n14": "0.7808 [0.7366, 0.8173]"
+    },
+    {
+      "model": "Baseline C (MLP: 20 Image Features Only)",
+      "pooled_visual_auroc_mean_std": "0.9085 \u00b1 0.0010",
+      "pooled_visual_per_flight_range_n3": "0.9097 [0.9055, 0.9153]",
+      "nominal_per_flight_range_n3": "0.6144 [0.5472, 0.6745]",
+      "low_per_flight_range_n3": "0.5187 [0.4403, 0.5648]",
+      "transition_per_flight_range_n3": "0.9655 [0.9629, 0.9675]",
+      "medium_per_flight_range_n3": "0.4835 [0.3953, 0.5883]",
+      "high_per_flight_range_n3": "Undefined (single-class)",
+      "motion_auroc_mean_std": "0.6513 \u00b1 0.0053",
+      "motion_flight_cluster_ci_n14": "0.6571 [0.5872, 0.7077]"
+    },
+    {
+      "model": "Baseline C (LogReg: 20 Image Features Only)",
+      "pooled_visual_auroc_mean_std": "0.8905 \u00b1 0.0000",
+      "pooled_visual_per_flight_range_n3": "0.8905 [0.8866, 0.8990]",
+      "nominal_per_flight_range_n3": "0.4856 [0.4423, 0.5155]",
+      "low_per_flight_range_n3": "0.4766 [0.4546, 0.4976]",
+      "transition_per_flight_range_n3": "0.8907 [0.8651, 0.9217]",
+      "medium_per_flight_range_n3": "0.4109 [0.3655, 0.5012]",
+      "high_per_flight_range_n3": "Undefined (single-class)",
+      "motion_auroc_mean_std": "0.5469 \u00b1 0.0000",
+      "motion_flight_cluster_ci_n14": "0.5469 [0.4940, 0.5895]"
+    },
+    {
+      "model": "Baseline D (MLP: Regime ID + Alpha)",
+      "pooled_visual_auroc_mean_std": "0.9029 \u00b1 0.0014",
+      "pooled_visual_per_flight_range_n3": "0.9035 [0.8981, 0.9077]",
+      "nominal_per_flight_range_n3": "0.5000 [0.5000, 0.5000]",
+      "low_per_flight_range_n3": "0.5000 [0.5000, 0.5000]",
+      "transition_per_flight_range_n3": "0.9414 [0.9331, 0.9556]",
+      "medium_per_flight_range_n3": "0.5000 [0.5000, 0.5000]",
+      "high_per_flight_range_n3": "Undefined (single-class)",
+      "motion_auroc_mean_std": "0.5000 \u00b1 0.0001",
+      "motion_flight_cluster_ci_n14": "0.5000 [0.5000, 0.5000]"
+    },
+    {
+      "model": "Baseline D (LogReg: Regime ID + Alpha)",
+      "pooled_visual_auroc_mean_std": "0.8826 \u00b1 0.0000",
+      "pooled_visual_per_flight_range_n3": "0.8826 [0.8723, 0.8920]",
+      "nominal_per_flight_range_n3": "0.5000 [0.5000, 0.5000]",
+      "low_per_flight_range_n3": "0.5000 [0.5000, 0.5000]",
+      "transition_per_flight_range_n3": "0.9000 [0.8692, 0.9164]",
+      "medium_per_flight_range_n3": "0.5000 [0.5000, 0.5000]",
+      "high_per_flight_range_n3": "Undefined (single-class)",
+      "motion_auroc_mean_std": "0.5000 \u00b1 0.0000",
+      "motion_flight_cluster_ci_n14": "0.5000 [0.5000, 0.5000]"
+    }
+  ],
+  "cluster_bootstrap_paired_differences": [
+    {
+      "comparison": "B_minus_A",
+      "target_subset": "POOLED",
+      "mean_diff": 0.0526,
+      "ci_lower_2.5": 0.0433,
+      "ci_upper_97.5": 0.0592,
+      "ci_display": "+0.0526 [+0.0433, +0.0592]"
+    },
+    {
+      "comparison": "B_minus_A",
+      "target_subset": "NOMINAL",
+      "mean_diff": 0.0106,
+      "ci_lower_2.5": -0.0131,
+      "ci_upper_97.5": 0.0467,
+      "ci_display": "+0.0106 [-0.0131, +0.0467]"
+    },
+    {
+      "comparison": "B_minus_A",
+      "target_subset": "LOW",
+      "mean_diff": 0.0087,
+      "ci_lower_2.5": -0.0265,
+      "ci_upper_97.5": 0.0263,
+      "ci_display": "+0.0087 [-0.0265, +0.0263]"
+    },
+    {
+      "comparison": "B_minus_A",
+      "target_subset": "TRANSITION",
+      "mean_diff": 0.0407,
+      "ci_lower_2.5": 0.0267,
+      "ci_upper_97.5": 0.047,
+      "ci_display": "+0.0407 [+0.0267, +0.0470]"
+    },
+    {
+      "comparison": "B_minus_A",
+      "target_subset": "MEDIUM",
+      "mean_diff": 0.0974,
+      "ci_lower_2.5": -0.0076,
+      "ci_upper_97.5": 0.1818,
+      "ci_display": "+0.0974 [-0.0076, +0.1818]"
+    },
+    {
+      "comparison": "B_minus_D_mlp",
+      "target_subset": "POOLED",
+      "mean_diff": 0.033,
+      "ci_lower_2.5": 0.0249,
+      "ci_upper_97.5": 0.043,
+      "ci_display": "+0.0330 [+0.0249, +0.0430]"
+    },
+    {
+      "comparison": "B_minus_D_mlp",
+      "target_subset": "TRANSITION",
+      "mean_diff": 0.0281,
+      "ci_lower_2.5": 0.0174,
+      "ci_upper_97.5": 0.0356,
+      "ci_display": "+0.0281 [+0.0174, +0.0356]"
+    }
+  ],
+  "per_trial_regime_auroc": [
+    {
+      "regime": "NOMINAL",
+      "base_flight": "sweep_G_C_R1",
+      "sequence_id": "r3_sweep_G_C_R1_nominal",
+      "frames": 714,
+      "positives": 83,
+      "positive_rate_pct": 11.6,
+      "frozen_r2_auroc": 0.7886,
+      "model_a_auroc": 0.7917,
+      "model_b_auroc": 0.7786,
+      "baseline_c_mlp_auroc": 0.6745,
+      "baseline_c_lr_auroc": 0.5155,
+      "baseline_d_mlp_auroc": 0.5,
+      "baseline_d_lr_auroc": 0.5
+    },
+    {
+      "regime": "NOMINAL",
+      "base_flight": "sweep_G_B_R2",
+      "sequence_id": "r3_sweep_G_B_R2_nominal",
+      "frames": 725,
+      "positives": 72,
+      "positive_rate_pct": 9.9,
+      "frozen_r2_auroc": 0.742,
+      "model_a_auroc": 0.7222,
+      "model_b_auroc": 0.7205,
+      "baseline_c_mlp_auroc": 0.5472,
+      "baseline_c_lr_auroc": 0.5138,
+      "baseline_d_mlp_auroc": 0.5,
+      "baseline_d_lr_auroc": 0.5
+    },
+    {
+      "regime": "NOMINAL",
+      "base_flight": "sweep_G_S_R2",
+      "sequence_id": "r3_sweep_G_S_R2_nominal",
+      "frames": 792,
+      "positives": 90,
+      "positive_rate_pct": 11.4,
+      "frozen_r2_auroc": 0.7572,
+      "model_a_auroc": 0.6919,
+      "model_b_auroc": 0.7386,
+      "baseline_c_mlp_auroc": 0.6053,
+      "baseline_c_lr_auroc": 0.4423,
+      "baseline_d_mlp_auroc": 0.5,
+      "baseline_d_lr_auroc": 0.5
+    },
+    {
+      "regime": "LOW",
+      "base_flight": "sweep_G_C_R1",
+      "sequence_id": "r3_sweep_G_C_R1_low",
+      "frames": 686,
+      "positives": 199,
+      "positive_rate_pct": 29.0,
+      "frozen_r2_auroc": 0.7676,
+      "model_a_auroc": 0.7332,
+      "model_b_auroc": 0.7067,
+      "baseline_c_mlp_auroc": 0.5412,
+      "baseline_c_lr_auroc": 0.4976,
+      "baseline_d_mlp_auroc": 0.5,
+      "baseline_d_lr_auroc": 0.5
+    },
+    {
+      "regime": "LOW",
+      "base_flight": "sweep_G_B_R2",
+      "sequence_id": "r3_sweep_G_B_R2_low",
+      "frames": 694,
+      "positives": 198,
+      "positive_rate_pct": 28.5,
+      "frozen_r2_auroc": 0.5814,
+      "model_a_auroc": 0.5756,
+      "model_b_auroc": 0.5956,
+      "baseline_c_mlp_auroc": 0.4403,
+      "baseline_c_lr_auroc": 0.4546,
+      "baseline_d_mlp_auroc": 0.5,
+      "baseline_d_lr_auroc": 0.5
+    },
+    {
+      "regime": "LOW",
+      "base_flight": "sweep_G_S_R2",
+      "sequence_id": "r3_sweep_G_S_R2_low",
+      "frames": 757,
+      "positives": 248,
+      "positive_rate_pct": 32.8,
+      "frozen_r2_auroc": 0.7198,
+      "model_a_auroc": 0.7018,
+      "model_b_auroc": 0.727,
+      "baseline_c_mlp_auroc": 0.5648,
+      "baseline_c_lr_auroc": 0.4787,
+      "baseline_d_mlp_auroc": 0.5,
+      "baseline_d_lr_auroc": 0.5
+    },
+    {
+      "regime": "TRANSITION",
+      "base_flight": "sweep_G_C_R1",
+      "sequence_id": "r3_sweep_G_C_R1_transition",
+      "frames": 538,
+      "positives": 265,
+      "positive_rate_pct": 49.3,
+      "frozen_r2_auroc": 0.4561,
+      "model_a_auroc": 0.9217,
+      "model_b_auroc": 0.9687,
+      "baseline_c_mlp_auroc": 0.9675,
+      "baseline_c_lr_auroc": 0.8651,
+      "baseline_d_mlp_auroc": 0.9331,
+      "baseline_d_lr_auroc": 0.8692
+    },
+    {
+      "regime": "TRANSITION",
+      "base_flight": "sweep_G_B_R2",
+      "sequence_id": "r3_sweep_G_B_R2_transition",
+      "frames": 542,
+      "positives": 257,
+      "positive_rate_pct": 47.4,
+      "frozen_r2_auroc": 0.4787,
+      "model_a_auroc": 0.9389,
+      "model_b_auroc": 0.9656,
+      "baseline_c_mlp_auroc": 0.9629,
+      "baseline_c_lr_auroc": 0.9217,
+      "baseline_d_mlp_auroc": 0.9332,
+      "baseline_d_lr_auroc": 0.9121
+    },
+    {
+      "regime": "TRANSITION",
+      "base_flight": "sweep_G_S_R2",
+      "sequence_id": "r3_sweep_G_S_R2_transition",
+      "frames": 585,
+      "positives": 301,
+      "positive_rate_pct": 51.5,
+      "frozen_r2_auroc": 0.4726,
+      "model_a_auroc": 0.9263,
+      "model_b_auroc": 0.9729,
+      "baseline_c_mlp_auroc": 0.9673,
+      "baseline_c_lr_auroc": 0.8885,
+      "baseline_d_mlp_auroc": 0.9556,
+      "baseline_d_lr_auroc": 0.9164
+    },
+    {
+      "regime": "MEDIUM",
+      "base_flight": "sweep_G_C_R1",
+      "sequence_id": "r3_sweep_G_C_R1_medium",
+      "frames": 499,
+      "positives": 470,
+      "positive_rate_pct": 94.2,
+      "frozen_r2_auroc": 0.1025,
+      "model_a_auroc": 0.5634,
+      "model_b_auroc": 0.7452,
+      "baseline_c_mlp_auroc": 0.5883,
+      "baseline_c_lr_auroc": 0.5012,
+      "baseline_d_mlp_auroc": 0.5,
+      "baseline_d_lr_auroc": 0.5
+    },
+    {
+      "regime": "MEDIUM",
+      "base_flight": "sweep_G_B_R2",
+      "sequence_id": "r3_sweep_G_B_R2_medium",
+      "frames": 492,
+      "positives": 466,
+      "positive_rate_pct": 94.7,
+      "frozen_r2_auroc": 0.4022,
+      "model_a_auroc": 0.7072,
+      "model_b_auroc": 0.6996,
+      "baseline_c_mlp_auroc": 0.3953,
+      "baseline_c_lr_auroc": 0.3762,
+      "baseline_d_mlp_auroc": 0.5,
+      "baseline_d_lr_auroc": 0.5
+    },
+    {
+      "regime": "MEDIUM",
+      "base_flight": "sweep_G_S_R2",
+      "sequence_id": "r3_sweep_G_S_R2_medium",
+      "frames": 555,
+      "positives": 522,
+      "positive_rate_pct": 94.1,
+      "frozen_r2_auroc": 0.3146,
+      "model_a_auroc": 0.5932,
+      "model_b_auroc": 0.7016,
+      "baseline_c_mlp_auroc": 0.4705,
+      "baseline_c_lr_auroc": 0.3655,
+      "baseline_d_mlp_auroc": 0.5,
+      "baseline_d_lr_auroc": 0.5
+    },
+    {
+      "regime": "HIGH",
+      "base_flight": "sweep_G_C_R1",
+      "sequence_id": "r3_sweep_G_C_R1_high",
+      "frames": 232,
+      "positives": 232,
+      "positive_rate_pct": 100.0,
+      "frozen_r2_auroc": "Undefined (single-class)",
+      "model_a_auroc": "Undefined (single-class)",
+      "model_b_auroc": "Undefined (single-class)",
+      "baseline_c_mlp_auroc": "Undefined (single-class)",
+      "baseline_c_lr_auroc": "Undefined (single-class)",
+      "baseline_d_mlp_auroc": "Undefined (single-class)",
+      "baseline_d_lr_auroc": "Undefined (single-class)"
+    },
+    {
+      "regime": "HIGH",
+      "base_flight": "sweep_G_B_R2",
+      "sequence_id": "r3_sweep_G_B_R2_high",
+      "frames": 228,
+      "positives": 228,
+      "positive_rate_pct": 100.0,
+      "frozen_r2_auroc": "Undefined (single-class)",
+      "model_a_auroc": "Undefined (single-class)",
+      "model_b_auroc": "Undefined (single-class)",
+      "baseline_c_mlp_auroc": "Undefined (single-class)",
+      "baseline_c_lr_auroc": "Undefined (single-class)",
+      "baseline_d_mlp_auroc": "Undefined (single-class)",
+      "baseline_d_lr_auroc": "Undefined (single-class)"
+    },
+    {
+      "regime": "HIGH",
+      "base_flight": "sweep_G_S_R2",
+      "sequence_id": "r3_sweep_G_S_R2_high",
+      "frames": 237,
+      "positives": 237,
+      "positive_rate_pct": 100.0,
+      "frozen_r2_auroc": "Undefined (single-class)",
+      "model_a_auroc": "Undefined (single-class)",
+      "model_b_auroc": "Undefined (single-class)",
+      "baseline_c_mlp_auroc": "Undefined (single-class)",
+      "baseline_c_lr_auroc": "Undefined (single-class)",
+      "baseline_d_mlp_auroc": "Undefined (single-class)",
+      "baseline_d_lr_auroc": "Undefined (single-class)"
+    }
+  ]
+}

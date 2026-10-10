@@ -1,0 +1,560 @@
+commit 9394a40a3d95fb10d80a117d2835a8f9797aaaf8
+Author: PPurab-006 <purabsen2016@gmail.com>
+Date:   Sat Oct 10 12:10:08 2026 +0530
+
+    feat(v2): initial train_and_evaluate_v2.py for first test-set evaluation
+
+diff --git a/r3_v2/src/train_and_evaluate_v2.py b/r3_v2/src/train_and_evaluate_v2.py
+new file mode 100644
+index 0000000..dfb8568
+--- /dev/null
++++ b/r3_v2/src/train_and_evaluate_v2.py
+@@ -0,0 +1,548 @@
++#!/usr/bin/env python3
++"""
++Research 3 (MOSAIC) — V2 Training, Validation Calibration, and Test Evaluation.
++
++Executes:
++1. Retrains Model A (15 features) and Model B (35 features) across 5 seeds (42..46).
++2. Selects optimal decision threshold on joint validation pool by maximizing F1.
++3. Evaluates on protected test set (Visual Test, Motion Test, Per-Regime, Per-Flight).
++4. Evaluates Frozen R2 model on strict test set.
++5. Computes cluster-level bootstrap (1,000 resamples, seed 42) for 95% CIs and paired differences.
++6. Runs single-feature directionality table.
++7. Saves all result CSVs and v2_summary.json.
++"""
++
++import json
++import os
++import sys
++from pathlib import Path
++from typing import Dict, List, Tuple
++
++REPO_ROOT = Path(__file__).resolve().parent.parent.parent
++if str(REPO_ROOT) not in sys.path:
++    sys.path.insert(0, str(REPO_ROOT))
++
++import joblib
++import numpy as np
++import pandas as pd
++from sklearn.metrics import (
++    average_precision_score,
++    confusion_matrix,
++    f1_score,
++    precision_score,
++    recall_score,
++    roc_auc_score,
++)
++from sklearn.preprocessing import StandardScaler
++import torch
++
++from r3_v2.src.extract_v2_features import (
++    FEAT_A_COLS,
++    FEAT_B_COLS,
++    FEAT_IMG_COLS,
++)
++from r3_v2.src.models import (
++    SmallMLP,
++    find_best_f1_threshold,
++    set_seed,
++    train_mlp_model,
++)
++from r3_v2.src.single_feature_directions import analyze_single_feature_directions
++
++R3_ROOT = Path(__file__).resolve().parent.parent.parent
++MODELS_DIR = R3_ROOT / "r3_v2" / "models"
++RESULTS_DIR = R3_ROOT / "r3_v2" / "results"
++DATA_PATH = R3_ROOT / "r3_v2" / "data" / "r3_v2_strict_dataset.csv"
++
++FROZEN_MODEL_PATH = R3_ROOT / "models" / "expanded_mlp.pt"
++FROZEN_SCALER_PATH = R3_ROOT / "models" / "expanded_scaler.joblib"
++
++MODELS_DIR.mkdir(parents=True, exist_ok=True)
++RESULTS_DIR.mkdir(parents=True, exist_ok=True)
++
++SEEDS = [42, 43, 44, 45, 46]
++REGIMES_EVAL = ["NOMINAL", "LOW", "TRANSITION", "MEDIUM"]
++
++
++def evaluate_predictions(y_true: np.ndarray, probs: np.ndarray, threshold: float) -> Dict:
++    """Computes full classification and ranking metrics."""
++    preds = (probs >= threshold).astype(int)
++    n_pos = int(np.sum(y_true))
++    n_tot = len(y_true)
++    pos_rate = float(n_pos / n_tot * 100.0) if n_tot > 0 else 0.0
++
++    if len(np.unique(y_true)) > 1:
++        auroc = float(roc_auc_score(y_true, probs))
++        auprc = float(average_precision_score(y_true, probs))
++    else:
++        auroc = float("nan")
++        auprc = float("nan")
++
++    f1 = float(f1_score(y_true, preds, zero_division=0))
++    prec = float(precision_score(y_true, preds, zero_division=0))
++    rec = float(recall_score(y_true, preds, zero_division=0))
++
++    if len(np.unique(y_true)) > 1:
++        tn, fp, fn, tp = confusion_matrix(y_true, preds, labels=[0, 1]).ravel()
++        fpr = float(fp / (fp + tn)) if (fp + tn) > 0 else 0.0
++    else:
++        tn = int(np.sum((y_true == 0) & (preds == 0)))
++        fp = int(np.sum((y_true == 0) & (preds == 1)))
++        fn = int(np.sum((y_true == 1) & (preds == 0)))
++        tp = int(np.sum((y_true == 1) & (preds == 1)))
++        fpr = float("nan")
++
++    return {
++        "samples": n_tot,
++        "positives": n_pos,
++        "positive_rate_pct": round(pos_rate, 2),
++        "threshold": round(threshold, 3),
++        "auroc": round(auroc, 4),
++        "auprc": round(auprc, 4),
++        "f1": round(f1, 4),
++        "precision": round(prec, 4),
++        "recall": round(rec, 4),
++        "fpr": round(fpr, 4) if not np.isnan(fpr) else float("nan"),
++        "tn": int(tn),
++        "fp": int(fp),
++        "fn": int(fn),
++        "tp": int(tp),
++    }
++
++
++def run_experiment() -> Dict:
++    """End-to-end execution of V2 protocol."""
++    print("=" * 78)
++    print("MOSAIC (RESEARCH 3) — V2 LEAKAGE-FREE EXPERIMENT EXECUTION")
++    print("=" * 78)
++
++    # 1. Load data
++    df = pd.read_csv(DATA_PATH)
++    print(f"Loaded dataset: {len(df)} total frames across 82 sequences.")
++
++    df_train = df[df["split"] == "train"].copy().reset_index(drop=True)
++    df_val = df[df["split"] == "val"].copy().reset_index(drop=True)
++    df_test = df[df["split"] == "test"].copy().reset_index(drop=True)
++
++    print(f"  Train partition: {len(df_train)} frames ({df_train['sequence_id'].nunique()} sequences)")
++    print(f"  Val partition:   {len(df_val)} frames ({df_val['sequence_id'].nunique()} sequences)")
++    print(f"  Test partition:  {len(df_test)} frames ({df_test['sequence_id'].nunique()} sequences)")
++
++    y_train = df_train["is_failure_within_next_k"].values.astype(float)
++    y_val = df_val["is_failure_within_next_k"].values.astype(float)
++
++    # Subsets of test set
++    test_r3_mask = (df_test["domain"] == "R3_VISUAL")
++    test_r2_mask = (df_test["domain"] == "R2_MOTION")
++    y_test_r3 = df_test.loc[test_r3_mask, "is_failure_within_next_k"].values.astype(int)
++    y_test_r2 = df_test.loc[test_r2_mask, "is_failure_within_next_k"].values.astype(int)
++
++    # 2. Frozen R2 Baseline Evaluation
++    print("\n--- Evaluating Frozen R2 Baseline Model on Strict Test Set ---")
++    frozen_scaler = joblib.load(FROZEN_SCALER_PATH)
++    frozen_model = SmallMLP(15, 32, 16)
++    frozen_model.load_state_dict(torch.load(FROZEN_MODEL_PATH, map_location="cpu"))
++    frozen_model.eval()
++
++    X_val_frozen = frozen_scaler.transform(df_val[FEAT_A_COLS].values.astype(float))
++    with torch.no_grad():
++        val_probs_frozen = torch.sigmoid(frozen_model(torch.tensor(X_val_frozen, dtype=torch.float32))).numpy()
++    val_th_frozen = find_best_f1_threshold(y_val, val_probs_frozen)["threshold"]
++
++    X_test_frozen = frozen_scaler.transform(df_test[FEAT_A_COLS].values.astype(float))
++    with torch.no_grad():
++        test_probs_frozen = torch.sigmoid(frozen_model(torch.tensor(X_test_frozen, dtype=torch.float32))).numpy()
++
++    p_test_r3_frozen = test_probs_frozen[test_r3_mask]
++    p_test_r2_frozen = test_probs_frozen[test_r2_mask]
++
++    frozen_metrics_r3 = evaluate_predictions(y_test_r3, p_test_r3_frozen, 0.50)
++    frozen_metrics_r2 = evaluate_predictions(y_test_r2, p_test_r2_frozen, 0.50)
++    print(f"Frozen R2 Baseline: Visual AUROC={frozen_metrics_r3['auroc']}, F1={frozen_metrics_r3['f1']}, Motion AUROC={frozen_metrics_r2['auroc']}")
++
++    # 3. Train Model A and Model B across 5 seeds
++    print("\n--- Training Model A (15 features) and Model B (35 features) across 5 seeds ---")
++    per_seed_records = []
++
++    # Containers for seed predictions on test set
++    seed_probs_a_r3 = []
++    seed_probs_a_r2 = []
++    seed_probs_b_r3 = []
++    seed_probs_b_r2 = []
++
++    # Full test probs containers
++    seed_test_probs_a = []
++    seed_test_probs_b = []
++    seed_thresholds_a = []
++    seed_thresholds_b = []
++
++    for seed in SEEDS:
++        print(f"\n[Seed {seed}]")
++        # Scaler A: 15 features fitted ONLY on training split
++        scaler_a = StandardScaler()
++        X_tr_a = scaler_a.fit_transform(df_train[FEAT_A_COLS].values.astype(float))
++        X_va_a = scaler_a.transform(df_val[FEAT_A_COLS].values.astype(float))
++        X_te_a = scaler_a.transform(df_test[FEAT_A_COLS].values.astype(float))
++
++        # Scaler B: 35 features fitted ONLY on training split
++        scaler_b = StandardScaler()
++        X_tr_b = scaler_b.fit_transform(df_train[FEAT_B_COLS].values.astype(float))
++        X_va_b = scaler_b.transform(df_val[FEAT_B_COLS].values.astype(float))
++        X_te_b = scaler_b.transform(df_test[FEAT_B_COLS].values.astype(float))
++
++        # Train Model A
++        model_a, hist_a = train_mlp_model(X_tr_a, y_train, X_va_a, y_val, input_dim=15, seed=seed)
++        # Train Model B
++        model_b, hist_b = train_mlp_model(X_tr_b, y_train, X_va_b, y_val, input_dim=35, seed=seed)
++
++        # Validation calibration
++        with torch.no_grad():
++            p_val_a = torch.sigmoid(model_a(torch.tensor(X_va_a, dtype=torch.float32))).numpy()
++            p_val_b = torch.sigmoid(model_b(torch.tensor(X_va_b, dtype=torch.float32))).numpy()
++
++        val_res_a = find_best_f1_threshold(y_val, p_val_a)
++        val_res_b = find_best_f1_threshold(y_val, p_val_b)
++        th_a = val_res_a["threshold"]
++        th_b = val_res_b["threshold"]
++
++        seed_thresholds_a.append(th_a)
++        seed_thresholds_b.append(th_b)
++
++        # Test evaluation
++        with torch.no_grad():
++            p_te_a = torch.sigmoid(model_a(torch.tensor(X_te_a, dtype=torch.float32))).numpy()
++            p_te_b = torch.sigmoid(model_b(torch.tensor(X_te_b, dtype=torch.float32))).numpy()
++
++        seed_test_probs_a.append(p_te_a)
++        seed_test_probs_b.append(p_te_b)
++
++        p_te_a_r3 = p_te_a[test_r3_mask]
++        p_te_a_r2 = p_te_a[test_r2_mask]
++        p_te_b_r3 = p_te_b[test_r3_mask]
++        p_te_b_r2 = p_te_b[test_r2_mask]
++
++        seed_probs_a_r3.append(p_te_a_r3)
++        seed_probs_a_r2.append(p_te_a_r2)
++        seed_probs_b_r3.append(p_te_b_r3)
++        seed_probs_b_r2.append(p_te_b_r2)
++
++        m_a_r3 = evaluate_predictions(y_test_r3, p_te_a_r3, th_a)
++        m_a_r2 = evaluate_predictions(y_test_r2, p_te_a_r2, th_a)
++        m_b_r3 = evaluate_predictions(y_test_r3, p_te_b_r3, th_b)
++        m_b_r2 = evaluate_predictions(y_test_r2, p_te_b_r2, th_b)
++
++        print(f"  Model A (15 feat) -> Val Th: {th_a:.2f} | Visual AUC: {m_a_r3['auroc']}, F1: {m_a_r3['f1']} | Motion AUC: {m_a_r2['auroc']}")
++        print(f"  Model B (35 feat) -> Val Th: {th_b:.2f} | Visual AUC: {m_b_r3['auroc']}, F1: {m_b_r3['f1']} | Motion AUC: {m_b_r2['auroc']}")
++
++        # Save model checkpoints & scalers
++        torch.save(model_a.state_dict(), MODELS_DIR / f"model_a_seed_{seed}.pt")
++        torch.save(model_b.state_dict(), MODELS_DIR / f"model_b_seed_{seed}.pt")
++        joblib.dump(scaler_a, MODELS_DIR / f"scaler_a_seed_{seed}.joblib")
++        joblib.dump(scaler_b, MODELS_DIR / f"scaler_b_seed_{seed}.joblib")
++
++        per_seed_records.append({
++            "seed": seed,
++            "model_a_val_th": th_a,
++            "model_a_visual_auroc": m_a_r3["auroc"],
++            "model_a_visual_auprc": m_a_r3["auprc"],
++            "model_a_visual_precision": m_a_r3["precision"],
++            "model_a_visual_recall": m_a_r3["recall"],
++            "model_a_visual_f1": m_a_r3["f1"],
++            "model_a_motion_auroc": m_a_r2["auroc"],
++            "model_b_val_th": th_b,
++            "model_b_visual_auroc": m_b_r3["auroc"],
++            "model_b_visual_auprc": m_b_r3["auprc"],
++            "model_b_visual_precision": m_b_r3["precision"],
++            "model_b_visual_recall": m_b_r3["recall"],
++            "model_b_visual_f1": m_b_r3["f1"],
++            "model_b_motion_auroc": m_b_r2["auroc"],
++        })
++
++    df_per_seed = pd.DataFrame(per_seed_records)
++    df_per_seed.to_csv(RESULTS_DIR / "per_seed_metrics.csv", index=False)
++
++    # Compute mean ensemble probabilities across seeds
++    p_ensemble_a_test = np.mean(seed_test_probs_a, axis=0)
++    p_ensemble_b_test = np.mean(seed_test_probs_b, axis=0)
++    th_ensemble_a = float(np.mean(seed_thresholds_a))
++    th_ensemble_b = float(np.mean(seed_thresholds_b))
++
++    # 4. Regime-level AUROC evaluation (Nominal, Low, Transition, Medium)
++    print("\n--- Per-Regime AUROC Analysis ---")
++    regime_records = []
++    reg_aurocs = {"frozen": {}, "model_a": {}, "model_b": {}}
++
++    for regime in REGIMES_EVAL:
++        reg_mask = (df_test["domain"] == "R3_VISUAL") & (df_test["regime"] == regime)
++        y_reg = df_test.loc[reg_mask, "is_failure_within_next_k"].values
++        p_f_reg = test_probs_frozen[reg_mask]
++        p_a_reg = p_ensemble_a_test[reg_mask]
++        p_b_reg = p_ensemble_b_test[reg_mask]
++
++        auc_f = float(roc_auc_score(y_reg, p_f_reg)) if len(np.unique(y_reg)) > 1 else float("nan")
++        auc_a = float(roc_auc_score(y_reg, p_a_reg)) if len(np.unique(y_reg)) > 1 else float("nan")
++        auc_b = float(roc_auc_score(y_reg, p_b_reg)) if len(np.unique(y_reg)) > 1 else float("nan")
++
++        reg_aurocs["frozen"][regime] = auc_f
++        reg_aurocs["model_a"][regime] = auc_a
++        reg_aurocs["model_b"][regime] = auc_b
++
++        regime_records.append({
++            "regime": regime,
++            "samples": int(np.sum(reg_mask)),
++            "positives": int(np.sum(y_reg)),
++            "frozen_r2_auroc": round(auc_f, 4),
++            "model_a_auroc": round(auc_a, 4),
++            "model_b_auroc": round(auc_b, 4),
++        })
++
++    df_regime = pd.DataFrame(regime_records)
++    df_regime.to_csv(RESULTS_DIR / "per_regime_auroc.csv", index=False)
++    print(df_regime.to_string(index=False))
++
++    # 5. Per-Flight / Per-Trial AUROC
++    print("\n--- Per-Flight AUROC Analysis ---")
++    per_seq_records = []
++    for seq_id, seq_group in df_test.groupby("sequence_id", sort=False):
++        y_seq = seq_group["is_failure_within_next_k"].values
++        idx_seq = seq_group.index.values
++
++        if len(np.unique(y_seq)) > 1:
++            auc_f_seq = float(roc_auc_score(y_seq, test_probs_frozen[idx_seq]))
++            auc_a_seq = float(roc_auc_score(y_seq, p_ensemble_a_test[idx_seq]))
++            auc_b_seq = float(roc_auc_score(y_seq, p_ensemble_b_test[idx_seq]))
++        else:
++            auc_f_seq, auc_a_seq, auc_b_seq = float("nan"), float("nan"), float("nan")
++
++        per_seq_records.append({
++            "sequence_id": seq_id,
++            "domain": seq_group["domain"].iloc[0],
++            "regime": seq_group["regime"].iloc[0],
++            "samples": len(seq_group),
++            "positives": int(np.sum(y_seq)),
++            "frozen_r2_auroc": round(auc_f_seq, 4) if not np.isnan(auc_f_seq) else None,
++            "model_a_auroc": round(auc_a_seq, 4) if not np.isnan(auc_a_seq) else None,
++            "model_b_auroc": round(auc_b_seq, 4) if not np.isnan(auc_b_seq) else None,
++        })
++
++    df_per_seq = pd.DataFrame(per_seq_records)
++    df_per_seq.to_csv(RESULTS_DIR / "per_flight_auroc.csv", index=False)
++
++    # 6. Clustered Bootstrap (1,000 resamples at trial/flight level)
++    print("\n--- Computing Hierarchical Bootstrap 95% CIs (1,000 resamples, seed 42) ---")
++    rng = np.random.RandomState(42)
++    B = 1000
++
++    r3_trials = np.array(sorted(df_test[df_test["domain"] == "R3_VISUAL"]["sequence_id"].unique()))
++    r2_flights = np.array(sorted(df_test[df_test["domain"] == "R2_MOTION"]["sequence_id"].unique()))
++
++    # Group frame indices by sequence for fast resampling
++    seq_to_indices = {s: g.index.values for s, g in df_test.groupby("sequence_id")}
++
++    boot_metrics = {
++        "frozen": {"r3_auroc": [], "r3_auprc": [], "r3_f1": [], "r3_prec": [], "r3_rec": [], "r2_auroc": []},
++        "model_a": {"r3_auroc": [], "r3_auprc": [], "r3_f1": [], "r3_prec": [], "r3_rec": [], "r2_auroc": []},
++        "model_b": {"r3_auroc": [], "r3_auprc": [], "r3_f1": [], "r3_prec": [], "r3_rec": [], "r2_auroc": []},
++        "diff_b_minus_a": {"r3_auroc": [], "r3_auprc": [], "r3_f1": [], "r3_prec": [], "r3_rec": [], "r2_auroc": []},
++        "diff_a_minus_f": {"r3_auroc": [], "r3_auprc": [], "r3_f1": [], "r3_prec": [], "r3_rec": [], "r2_auroc": []},
++        "diff_b_minus_f": {"r3_auroc": [], "r3_auprc": [], "r3_f1": [], "r3_prec": [], "r3_rec": [], "r2_auroc": []},
++    }
++
++    for b in range(B):
++        # Resample R3 trials
++        resampled_r3_trials = rng.choice(r3_trials, size=len(r3_trials), replace=True)
++        idx_b_r3 = np.concatenate([seq_to_indices[t] for t in resampled_r3_trials])
++
++        # Resample R2 flights
++        resampled_r2_flights = rng.choice(r2_flights, size=len(r2_flights), replace=True)
++        idx_b_r2 = np.concatenate([seq_to_indices[f] for f in resampled_r2_flights])
++
++        y_b_r3 = df_test.loc[idx_b_r3, "is_failure_within_next_k"].values
++        y_b_r2 = df_test.loc[idx_b_r2, "is_failure_within_next_k"].values
++
++        # Frozen
++        p_f_r3 = test_probs_frozen[idx_b_r3]
++        p_f_r2 = test_probs_frozen[idx_b_r2]
++        m_f_r3 = evaluate_predictions(y_b_r3, p_f_r3, 0.50)
++        m_f_r2 = evaluate_predictions(y_b_r2, p_f_r2, 0.50)
++
++        # Model A
++        p_a_r3 = p_ensemble_a_test[idx_b_r3]
++        p_a_r2 = p_ensemble_a_test[idx_b_r2]
++        m_a_r3 = evaluate_predictions(y_b_r3, p_a_r3, th_ensemble_a)
++        m_a_r2 = evaluate_predictions(y_b_r2, p_a_r2, th_ensemble_a)
++
++        # Model B
++        p_b_r3 = p_ensemble_b_test[idx_b_r3]
++        p_b_r2 = p_ensemble_b_test[idx_b_r2]
++        m_b_r3 = evaluate_predictions(y_b_r3, p_b_r3, th_ensemble_b)
++        m_b_r2 = evaluate_predictions(y_b_r2, p_b_r2, th_ensemble_b)
++
++        # Store resample metrics
++        for m_key, f_val, a_val, b_val in [
++            ("r3_auroc", m_f_r3["auroc"], m_a_r3["auroc"], m_b_r3["auroc"]),
++            ("r3_auprc", m_f_r3["auprc"], m_a_r3["auprc"], m_b_r3["auprc"]),
++            ("r3_f1", m_f_r3["f1"], m_a_r3["f1"], m_b_r3["f1"]),
++            ("r3_prec", m_f_r3["precision"], m_a_r3["precision"], m_b_r3["precision"]),
++            ("r3_rec", m_f_r3["recall"], m_a_r3["recall"], m_b_r3["recall"]),
++            ("r2_auroc", m_f_r2["auroc"], m_a_r2["auroc"], m_b_r2["auroc"]),
++        ]:
++            boot_metrics["frozen"][m_key].append(f_val)
++            boot_metrics["model_a"][m_key].append(a_val)
++            boot_metrics["model_b"][m_key].append(b_val)
++            boot_metrics["diff_b_minus_a"][m_key].append(b_val - a_val)
++            boot_metrics["diff_a_minus_f"][m_key].append(a_val - f_val)
++            boot_metrics["diff_b_minus_f"][m_key].append(b_val - f_val)
++
++    # Compute 95% CIs
++    ci_records = []
++    for model_name in ["frozen", "model_a", "model_b"]:
++        for metric_name, values in boot_metrics[model_name].items():
++            arr = np.array(values)
++            ci_records.append({
++                "model": model_name,
++                "metric": metric_name,
++                "mean": round(float(np.mean(arr)), 4),
++                "ci_lower_2.5": round(float(np.percentile(arr, 2.5)), 4),
++                "ci_upper_97.5": round(float(np.percentile(arr, 97.5)), 4),
++            })
++    df_ci = pd.DataFrame(ci_records)
++    df_ci.to_csv(RESULTS_DIR / "bootstrap_confidence_intervals.csv", index=False)
++
++    diff_records = []
++    for diff_name in ["diff_b_minus_a", "diff_a_minus_f", "diff_b_minus_f"]:
++        for metric_name, values in boot_metrics[diff_name].items():
++            arr = np.array(values)
++            diff_records.append({
++                "comparison": diff_name,
++                "metric": metric_name,
++                "mean_diff": round(float(np.mean(arr)), 4),
++                "ci_lower_2.5": round(float(np.percentile(arr, 2.5)), 4),
++                "ci_upper_97.5": round(float(np.percentile(arr, 97.5)), 4),
++            })
++    df_diff = pd.DataFrame(diff_records)
++    df_diff.to_csv(RESULTS_DIR / "paired_bootstrap_differences.csv", index=False)
++
++    # 7. Summary metrics table across seeds
++    summary_rows = [
++        {
++            "model": "Frozen R2 Baseline",
++            "feature_set": "15 Motion Features",
++            "visual_auroc_mean": frozen_metrics_r3["auroc"],
++            "visual_auroc_std": 0.0,
++            "visual_auprc_mean": frozen_metrics_r3["auprc"],
++            "visual_auprc_std": 0.0,
++            "visual_precision_mean": frozen_metrics_r3["precision"],
++            "visual_precision_std": 0.0,
++            "visual_recall_mean": frozen_metrics_r3["recall"],
++            "visual_recall_std": 0.0,
++            "visual_f1_mean": frozen_metrics_r3["f1"],
++            "visual_f1_std": 0.0,
++            "motion_auroc_mean": frozen_metrics_r2["auroc"],
++            "motion_auroc_std": 0.0,
++        },
++        {
++            "model": "Model A (Retrained Refinement MLP)",
++            "feature_set": "15 Motion Features",
++            "visual_auroc_mean": round(float(df_per_seed["model_a_visual_auroc"].mean()), 4),
++            "visual_auroc_std": round(float(df_per_seed["model_a_visual_auroc"].std()), 4),
++            "visual_auprc_mean": round(float(df_per_seed["model_a_visual_auprc"].mean()), 4),
++            "visual_auprc_std": round(float(df_per_seed["model_a_visual_auprc"].std()), 4),
++            "visual_precision_mean": round(float(df_per_seed["model_a_visual_precision"].mean()), 4),
++            "visual_precision_std": round(float(df_per_seed["model_a_visual_precision"].std()), 4),
++            "visual_recall_mean": round(float(df_per_seed["model_a_visual_recall"].mean()), 4),
++            "visual_recall_std": round(float(df_per_seed["model_a_visual_recall"].std()), 4),
++            "visual_f1_mean": round(float(df_per_seed["model_a_visual_f1"].mean()), 4),
++            "visual_f1_std": round(float(df_per_seed["model_a_visual_f1"].std()), 4),
++            "motion_auroc_mean": round(float(df_per_seed["model_a_motion_auroc"].mean()), 4),
++            "motion_auroc_std": round(float(df_per_seed["model_a_motion_auroc"].std()), 4),
++        },
++        {
++            "model": "Model B (Ablation B: A + Image Features)",
++            "feature_set": "35 Features (15 Motion + 20 Image)",
++            "visual_auroc_mean": round(float(df_per_seed["model_b_visual_auroc"].mean()), 4),
++            "visual_auroc_std": round(float(df_per_seed["model_b_visual_auroc"].std()), 4),
++            "visual_auprc_mean": round(float(df_per_seed["model_b_visual_auprc"].mean()), 4),
++            "visual_auprc_std": round(float(df_per_seed["model_b_visual_auprc"].std()), 4),
++            "visual_precision_mean": round(float(df_per_seed["model_b_visual_precision"].mean()), 4),
++            "visual_precision_std": round(float(df_per_seed["model_b_visual_precision"].std()), 4),
++            "visual_recall_mean": round(float(df_per_seed["model_b_visual_recall"].mean()), 4),
++            "visual_recall_std": round(float(df_per_seed["model_b_visual_recall"].std()), 4),
++            "visual_f1_mean": round(float(df_per_seed["model_b_visual_f1"].mean()), 4),
++            "visual_f1_std": round(float(df_per_seed["model_b_visual_f1"].std()), 4),
++            "motion_auroc_mean": round(float(df_per_seed["model_b_motion_auroc"].mean()), 4),
++            "motion_auroc_std": round(float(df_per_seed["model_b_motion_auroc"].std()), 4),
++        },
++    ]
++    df_summary = pd.DataFrame(summary_rows)
++    df_summary.to_csv(RESULTS_DIR / "test_metrics_summary.csv", index=False)
++
++    # 8. Single-feature directionality table (Task 5)
++    print("\n--- Computing Single-Feature Directionality Table ---")
++    df_directions = analyze_single_feature_directions(df_test)
++    print(df_directions.to_string(index=False))
++
++    # 9. Master JSON Summary
++    within_regime_range = {
++        "frozen": [round(min(reg_aurocs["frozen"].values()), 4), round(max(reg_aurocs["frozen"].values()), 4)],
++        "model_a": [round(min(reg_aurocs["model_a"].values()), 4), round(max(reg_aurocs["model_a"].values()), 4)],
++        "model_b": [round(min(reg_aurocs["model_b"].values()), 4), round(max(reg_aurocs["model_b"].values()), 4)],
++    }
++
++    v2_summary = {
++        "experiment": "Research 3 (MOSAIC) — V2 Leakage-Free Experiment",
++        "protocol": "docs/V2_PROTOCOL.md",
++        "label_specification": "Strict: y_t = max(F_{t+1}..F_{t+5}), F_t=1 purged, boundary drops 5/5",
++        "seeds": SEEDS,
++        "models": {
++            "frozen_r2": {
++                "strict_visual_auroc": frozen_metrics_r3["auroc"],
++                "strict_visual_f1": frozen_metrics_r3["f1"],
++                "motion_auroc": frozen_metrics_r2["auroc"],
++                "within_regime_auroc_range": within_regime_range["frozen"],
++            },
++            "model_a_15_features": {
++                "strict_visual_auroc_mean": round(float(df_per_seed["model_a_visual_auroc"].mean()), 4),
++                "strict_visual_auroc_std": round(float(df_per_seed["model_a_visual_auroc"].std()), 4),
++                "strict_visual_f1_mean": round(float(df_per_seed["model_a_visual_f1"].mean()), 4),
++                "motion_auroc_mean": round(float(df_per_seed["model_a_motion_auroc"].mean()), 4),
++                "motion_auroc_std": round(float(df_per_seed["model_a_motion_auroc"].std()), 4),
++                "within_regime_auroc_range": within_regime_range["model_a"],
++            },
++            "model_b_35_features": {
++                "strict_visual_auroc_mean": round(float(df_per_seed["model_b_visual_auroc"].mean()), 4),
++                "strict_visual_auroc_std": round(float(df_per_seed["model_b_visual_auroc"].std()), 4),
++                "strict_visual_f1_mean": round(float(df_per_seed["model_b_visual_f1"].mean()), 4),
++                "motion_auroc_mean": round(float(df_per_seed["model_b_motion_auroc"].mean()), 4),
++                "motion_auroc_std": round(float(df_per_seed["model_b_motion_auroc"].std()), 4),
++                "within_regime_auroc_range": within_regime_range["model_b"],
++            },
++        },
++        "per_regime_auroc": regime_records,
++        "paired_differences": diff_records,
++    }
++
++    with open(RESULTS_DIR / "v2_summary.json", "w", encoding="utf-8") as f:
++        json.dump(v2_summary, f, indent=2)
++    print(f"\n-> Master V2 summary saved: {RESULTS_DIR / 'v2_summary.json'}")
++
++    # 10. Print Task 7 Short Table
++    print("\n" + "=" * 78)
++    print("TASK 7 SUMMARY TABLE:")
++    print("=" * 78)
++    print(f"{'Model':<35} | {'Strict Visual AUROC':<20} | {'Within-Regime Range':<22} | {'Motion AUROC':<12}")
++    print("-" * 78)
++    print(f"{'Frozen R2 Baseline':<35} | {frozen_metrics_r3['auroc']:<20.4f} | {str(within_regime_range['frozen']):<22} | {frozen_metrics_r2['auroc']:<12.4f}")
++    mean_a_vis = df_per_seed['model_a_visual_auroc'].mean()
++    mean_a_mot = df_per_seed['model_a_motion_auroc'].mean()
++    print(f"{'Model A (15 Features)':<35} | {mean_a_vis:<20.4f} | {str(within_regime_range['model_a']):<22} | {mean_a_mot:<12.4f}")
++    mean_b_vis = df_per_seed['model_b_visual_auroc'].mean()
++    mean_b_mot = df_per_seed['model_b_motion_auroc'].mean()
++    print(f"{'Model B (35 Features: A + Image)':<35} | {mean_b_vis:<20.4f} | {str(within_regime_range['model_b']):<22} | {mean_b_mot:<12.4f}")
++    print("=" * 78)
++
++    return v2_summary
++
++
++if __name__ == "__main__":
++    run_experiment()

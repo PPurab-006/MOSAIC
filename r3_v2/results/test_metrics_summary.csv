@@ -1,0 +1,4 @@
+model,feature_set,visual_auroc_mean,visual_auroc_std,visual_auprc_mean,visual_auprc_std,visual_precision_mean,visual_precision_std,visual_recall_mean,visual_recall_std,visual_f1_mean,visual_f1_std,motion_auroc_mean,motion_auroc_std
+Frozen R2 Baseline,15 Motion Features,0.6545,0.0,0.6248,0.0,0.6982,0.0,0.1489,0.0,0.2455,0.0,0.7665,0.0
+Model A (Retrained Refinement MLP),15 Motion Features,0.8798,0.0057,0.8967,0.005,0.8474,0.0078,0.7678,0.01,0.8056,0.0068,0.7557,0.0053
+Model B (Ablation B: A + Image Features),35 Features (15 Motion + 20 Image),0.9345,0.0014,0.9418,0.0009,0.8743,0.015,0.8502,0.0066,0.862,0.0049,0.7749,0.0052

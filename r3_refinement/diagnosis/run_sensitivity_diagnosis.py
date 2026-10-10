@@ -23,8 +23,8 @@ import torch.nn as nn
 R3_ROOT = Path(__file__).resolve().parent.parent.parent
 PROCESSED_DIR = R3_ROOT / "data" / "processed"
 DATASET_R3 = PROCESSED_DIR / "r3_dataset_k5.csv"
-DATASET_R2 = Path("/home/purab/Purab/Projects/Research2/data/processed/expanded_frames_v2_k5.csv")
-R2_SPLIT = Path("/home/purab/Purab/Projects/Research2/data/processed/expanded_flight_split.csv")
+DATASET_R2 = R3_ROOT.parent / "Research2" / "data" / "processed" / "expanded_frames_v2_k5.csv"
+R2_SPLIT = R3_ROOT.parent / "Research2" / "data" / "processed" / "expanded_flight_split.csv"
 MODEL_PATH = R3_ROOT / "models" / "expanded_mlp.pt"
 SCALER_PATH = R3_ROOT / "models" / "expanded_scaler.joblib"
 MANIFEST_PATH = R3_ROOT / "models" / "frozen_r2_manifest.json"

@@ -2,7 +2,7 @@
 # Research 3 — Automated Execution Pipeline for Analysis, Evaluation, and Figures
 set -e
 
-REPO_DIR="/home/purab/Purab/Projects/Research3"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PYTHON_BIN="${REPO_DIR}/.venv/bin/python3"
 
 echo "======================================================================"
@@ -10,7 +10,7 @@ echo "Starting Research 3 Analysis Pipeline"
 echo "======================================================================"
 
 echo "[1/6] Extracting features and assembling K=5 dataset..."
-$PYTHON_BIN "${REPO_DIR}/scripts/03_extract_features_and_labels.py"
+$PYTHON_BIN "${REPO_DIR}/scripts/03_extract_features_and_labels.py" --legacy-label
 
 echo "[2/6] Evaluating frozen Research 2 predictor transfer..."
 $PYTHON_BIN "${REPO_DIR}/scripts/04_evaluate_frozen_r2_transfer.py"

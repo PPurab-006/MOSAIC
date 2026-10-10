@@ -1,0 +1,7 @@
+feature_name,raw_column,r2_motion_test_auroc,r2_motion_direction,r2_motion_effective_auroc,r3_visual_test_auroc,r3_visual_direction,r3_visual_effective_auroc,cross_domain_alignment
+flow_magnitude,feature_vel_mean_lag0,0.6981,+,0.6981,0.4406,-,0.5594,DISCORDANT (INVERTED)
+yaw_rate,eis_yaw_rate_deg_lag0,0.6895,+,0.6895,0.5056,+,0.5056,CONCORDANT
+mean_gradient_magnitude,mean_grad_mag_lag0,0.531,+,0.531,0.1108,-,0.8892,DISCORDANT (INVERTED)
+laplacian_variance,laplacian_var_lag0,0.4451,-,0.5549,0.1004,-,0.8996,CONCORDANT
+pixel_std,pixel_std_lag0,0.4745,-,0.5255,0.1077,-,0.8923,CONCORDANT
+shi_tomasi_corners,shi_tomasi_corners_lag0,0.4873,-,0.5127,0.7809,+,0.7809,DISCORDANT (INVERTED)

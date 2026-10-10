@@ -1,6 +1,9 @@
 # Research 3 Refinement Study: Sensitivity Recovery Across Failure Mechanisms
 ## Recovering Sensitivity to Visually Induced VO Failures Without Sacrificing Motion-Induced Generalization
 
+> [!WARNING]
+> **SUPERSEDED. These results used a label that included the current frame (`range(0, k+1)`). See [docs/V2_PROTOCOL.md](docs/V2_PROTOCOL.md), [docs/V2_DEVIATIONS.md](docs/V2_DEVIATIONS.md) and [r3_v2/results/](r3_v2/results/) for the strict re-evaluation.**
+
 ---
 
 ## 1. Executive Summary & Scientific Verdict
@@ -173,27 +176,27 @@ Episode dynamics across contiguous failure runs (`r3_refinement/results/metrics/
 ## 11. Reproducibility & Artifact Index
 
 ### Refinement Pipeline Scripts
-- [r3_refinement/diagnosis/run_sensitivity_diagnosis.py](file:///home/purab/Purab/Projects/Research3/r3_refinement/diagnosis/run_sensitivity_diagnosis.py): Diagnostic analysis script.
-- [r3_refinement/manifests/build_split_manifest.py](file:///home/purab/Purab/Projects/Research3/r3_refinement/manifests/build_split_manifest.py): Builds leak-free flight splits.
-- [r3_refinement/src/train_and_validate_refinement.py](file:///home/purab/Purab/Projects/Research3/r3_refinement/src/train_and_validate_refinement.py): Trains refined MLP and locks validation thresholds.
-- [r3_refinement/src/evaluate_protected_test_sets.py](file:///home/purab/Purab/Projects/Research3/r3_refinement/src/evaluate_protected_test_sets.py): Side-by-side protected evaluation.
-- [r3_refinement/src/statistical_analysis.py](file:///home/purab/Purab/Projects/Research3/r3_refinement/src/statistical_analysis.py): Paired per-flight tests and effect sizes.
-- [r3_refinement/src/run_ablation_analysis.py](file:///home/purab/Purab/Projects/Research3/r3_refinement/src/run_ablation_analysis.py): Component ablation script.
-- [r3_refinement/src/generate_refinement_figures.py](file:///home/purab/Purab/Projects/Research3/r3_refinement/src/generate_refinement_figures.py): Generates 4 publication figures.
-- [r3_refinement/tests/test_refinement_integrity.py](file:///home/purab/Purab/Projects/Research3/r3_refinement/tests/test_refinement_integrity.py): Automated test suite.
+- [r3_refinement/diagnosis/run_sensitivity_diagnosis.py](../../r3_refinement/diagnosis/run_sensitivity_diagnosis.py): Diagnostic analysis script.
+- [r3_refinement/manifests/build_split_manifest.py](../../r3_refinement/manifests/build_split_manifest.py): Builds leak-free flight splits.
+- [r3_refinement/src/train_and_validate_refinement.py](../../r3_refinement/src/train_and_validate_refinement.py): Trains refined MLP and locks validation thresholds.
+- [r3_refinement/src/evaluate_protected_test_sets.py](../../r3_refinement/src/evaluate_protected_test_sets.py): Side-by-side protected evaluation.
+- [r3_refinement/src/statistical_analysis.py](../../r3_refinement/src/statistical_analysis.py): Paired per-flight tests and effect sizes.
+- [r3_refinement/src/run_ablation_analysis.py](../../r3_refinement/src/run_ablation_analysis.py): Component ablation script.
+- [r3_refinement/src/generate_refinement_figures.py](../../r3_refinement/src/generate_refinement_figures.py): Generates 4 publication figures.
+- [r3_refinement/tests/test_refinement_integrity.py](../../r3_refinement/tests/test_refinement_integrity.py): Automated test suite.
 
 ### Model Artifacts & Manifests
-- [r3_refinement/models/refined_mlp.pt](file:///home/purab/Purab/Projects/Research3/r3_refinement/models/refined_mlp.pt): Refined PyTorch weights (1,057 params).
-- [r3_refinement/models/refined_scaler.joblib](file:///home/purab/Purab/Projects/Research3/r3_refinement/models/refined_scaler.joblib): Refined StandardScaler.
-- [r3_refinement/models/locked_thresholds.json](file:///home/purab/Purab/Projects/Research3/r3_refinement/models/locked_thresholds.json): Validation-locked decision thresholds.
-- [r3_refinement/manifests/refinement_split_manifest.json](file:///home/purab/Purab/Projects/Research3/r3_refinement/manifests/refinement_split_manifest.json): Split manifest.
+- [r3_refinement/models/refined_mlp.pt](../../r3_refinement/models/refined_mlp.pt): Refined PyTorch weights (1,057 params).
+- [r3_refinement/models/refined_scaler.joblib](../../r3_refinement/models/refined_scaler.joblib): Refined StandardScaler.
+- [r3_refinement/models/locked_thresholds.json](../../r3_refinement/models/locked_thresholds.json): Validation-locked decision thresholds.
+- [r3_refinement/manifests/refinement_split_manifest.json](../../r3_refinement/manifests/refinement_split_manifest.json): Split manifest.
 
 ### Quantitative Outputs & Figures
-- [r3_refinement/results/metrics/protected_evaluation_metrics.json](file:///home/purab/Purab/Projects/Research3/r3_refinement/results/metrics/protected_evaluation_metrics.json): Primary evaluation results.
-- [r3_refinement/results/metrics/per_flight_comparison.csv](file:///home/purab/Purab/Projects/Research3/r3_refinement/results/metrics/per_flight_comparison.csv): Per-flight metric records.
-- [r3_refinement/results/metrics/statistical_tests.json](file:///home/purab/Purab/Projects/Research3/r3_refinement/results/metrics/statistical_tests.json): Statistical significance tests.
-- [r3_refinement/results/metrics/ablation_results.json](file:///home/purab/Purab/Projects/Research3/r3_refinement/results/metrics/ablation_results.json): Factor attribution matrix.
-- [r3_refinement/results/figures/refinement_fig1_three_way_comparison.png](file:///home/purab/Purab/Projects/Research3/r3_refinement/results/figures/refinement_fig1_three_way_comparison.png): Figure 1.
-- [r3_refinement/results/figures/refinement_fig2_pr_roc_curves.png](file:///home/purab/Purab/Projects/Research3/r3_refinement/results/figures/refinement_fig2_pr_roc_curves.png): Figure 2.
-- [r3_refinement/results/figures/refinement_fig3_per_flight_deltas.png](file:///home/purab/Purab/Projects/Research3/r3_refinement/results/figures/refinement_fig3_per_flight_deltas.png): Figure 3.
-- [r3_refinement/results/figures/refinement_fig4_early_warning_comparison.png](file:///home/purab/Purab/Projects/Research3/r3_refinement/results/figures/refinement_fig4_early_warning_comparison.png): Figure 4.
+- [r3_refinement/results/metrics/protected_evaluation_metrics.json](../../r3_refinement/results/metrics/protected_evaluation_metrics.json): Primary evaluation results.
+- [r3_refinement/results/metrics/per_flight_comparison.csv](../../r3_refinement/results/metrics/per_flight_comparison.csv): Per-flight metric records.
+- [r3_refinement/results/metrics/statistical_tests.json](../../r3_refinement/results/metrics/statistical_tests.json): Statistical significance tests.
+- [r3_refinement/results/metrics/ablation_results.json](../../r3_refinement/results/metrics/ablation_results.json): Factor attribution matrix.
+- [r3_refinement/results/figures/refinement_fig1_three_way_comparison.png](../../r3_refinement/results/figures/refinement_fig1_three_way_comparison.png): Figure 1.
+- [r3_refinement/results/figures/refinement_fig2_pr_roc_curves.png](../../r3_refinement/results/figures/refinement_fig2_pr_roc_curves.png): Figure 2.
+- [r3_refinement/results/figures/refinement_fig3_per_flight_deltas.png](../../r3_refinement/results/figures/refinement_fig3_per_flight_deltas.png): Figure 3.
+- [r3_refinement/results/figures/refinement_fig4_early_warning_comparison.png](../../r3_refinement/results/figures/refinement_fig4_early_warning_comparison.png): Figure 4.

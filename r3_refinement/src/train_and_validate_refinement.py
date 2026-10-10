@@ -35,7 +35,7 @@ MODELS_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_PATH = REFINEMENT_DIR / "configs" / "refinement_config.yaml"
 MANIFEST_PATH = REFINEMENT_DIR / "manifests" / "refinement_split_manifest.json"
 
-DATASET_R2 = Path("/home/purab/Purab/Projects/Research2/data/processed/expanded_frames_v2_k5.csv")
+DATASET_R2 = R3_ROOT.parent / "Research2" / "data" / "processed" / "expanded_frames_v2_k5.csv"
 DATASET_R3 = R3_ROOT / "data" / "processed" / "r3_dataset_k5.csv"
 
 FROZEN_MODEL_PATH = R3_ROOT / "models" / "expanded_mlp.pt"

@@ -1,0 +1,16 @@
+regime,base_flight,sequence_id,frames,positives,positive_rate_pct,frozen_r2_auroc,model_a_auroc,model_b_auroc,baseline_c_mlp_auroc,baseline_c_lr_auroc,baseline_d_mlp_auroc,baseline_d_lr_auroc
+NOMINAL,sweep_G_C_R1,r3_sweep_G_C_R1_nominal,714,83,11.6,0.7886,0.7917,0.7786,0.6745,0.5155,0.5,0.5
+NOMINAL,sweep_G_B_R2,r3_sweep_G_B_R2_nominal,725,72,9.9,0.742,0.7222,0.7205,0.5472,0.5138,0.5,0.5
+NOMINAL,sweep_G_S_R2,r3_sweep_G_S_R2_nominal,792,90,11.4,0.7572,0.6919,0.7386,0.6053,0.4423,0.5,0.5
+LOW,sweep_G_C_R1,r3_sweep_G_C_R1_low,686,199,29.0,0.7676,0.7332,0.7067,0.5412,0.4976,0.5,0.5
+LOW,sweep_G_B_R2,r3_sweep_G_B_R2_low,694,198,28.5,0.5814,0.5756,0.5956,0.4403,0.4546,0.5,0.5
+LOW,sweep_G_S_R2,r3_sweep_G_S_R2_low,757,248,32.8,0.7198,0.7018,0.727,0.5648,0.4787,0.5,0.5
+TRANSITION,sweep_G_C_R1,r3_sweep_G_C_R1_transition,538,265,49.3,0.4561,0.9217,0.9687,0.9675,0.8651,0.9331,0.8692
+TRANSITION,sweep_G_B_R2,r3_sweep_G_B_R2_transition,542,257,47.4,0.4787,0.9389,0.9656,0.9629,0.9217,0.9332,0.9121
+TRANSITION,sweep_G_S_R2,r3_sweep_G_S_R2_transition,585,301,51.5,0.4726,0.9263,0.9729,0.9673,0.8885,0.9556,0.9164
+MEDIUM,sweep_G_C_R1,r3_sweep_G_C_R1_medium,499,470,94.2,0.1025,0.5634,0.7452,0.5883,0.5012,0.5,0.5
+MEDIUM,sweep_G_B_R2,r3_sweep_G_B_R2_medium,492,466,94.7,0.4022,0.7072,0.6996,0.3953,0.3762,0.5,0.5
+MEDIUM,sweep_G_S_R2,r3_sweep_G_S_R2_medium,555,522,94.1,0.3146,0.5932,0.7016,0.4705,0.3655,0.5,0.5
+HIGH,sweep_G_C_R1,r3_sweep_G_C_R1_high,232,232,100.0,Undefined (single-class),Undefined (single-class),Undefined (single-class),Undefined (single-class),Undefined (single-class),Undefined (single-class),Undefined (single-class)
+HIGH,sweep_G_B_R2,r3_sweep_G_B_R2_high,228,228,100.0,Undefined (single-class),Undefined (single-class),Undefined (single-class),Undefined (single-class),Undefined (single-class),Undefined (single-class),Undefined (single-class)
+HIGH,sweep_G_S_R2,r3_sweep_G_S_R2_high,237,237,100.0,Undefined (single-class),Undefined (single-class),Undefined (single-class),Undefined (single-class),Undefined (single-class),Undefined (single-class),Undefined (single-class)

@@ -1,6 +1,9 @@
 # Research 3: Cross-Mechanism VO Failure Generalization
 ## Evaluating Telemetry-Based Visual Odometry Failure Prediction Under Non-Motion Visual Degradation
 
+> [!WARNING]
+> **SUPERSEDED. These results used a label that included the current frame (`range(0, k+1)`). See [docs/V2_PROTOCOL.md](docs/V2_PROTOCOL.md), [docs/V2_DEVIATIONS.md](docs/V2_DEVIATIONS.md) and [r3_v2/results/](r3_v2/results/) for the strict re-evaluation.**
+
 ---
 
 ## 1. Abstract
@@ -22,7 +25,7 @@ Research 2 established that telemetry-based early warning of monocular 5-point E
 
 The authoritative Research 2 baseline comprises:
 - **Baseline Failure Mechanism**: Severe UAV angular velocities and accelerations causing large inter-frame optical flow disparities, motion blur, and feature tracking losses.
-- **Model**: A 2-hidden-layer MLP (`SmallMLP`: $15 \to 32 \to 16 \to 1$, 1,041 parameters).
+- **Model**: A 2-hidden-layer MLP (`SmallMLP`: $15 \to 32 \to 16 \to 1$, 1,057 parameters).
 - **Features**: 15 strictly ordered lagged signals derived from 3 base telemetry features (`eis_yaw_rate_deg`, `feature_vel_mean`, and keyframe classification `is_r_frame`) sampled at lags $\{0, 1, 2, 3, 5\}$.
 - **Preprocessing**: `StandardScaler` fitted on the R2 training sweep.
 - **Decision Threshold**: $\theta = 0.50$ (uncalibrated).
@@ -106,25 +109,25 @@ Vehicle motion in R3 was not completely static (P95 yaw rate was $35.89^\circ/\t
 ## 8. Dataset and Eligibility
 
 ### 8.1 Flight Cohort and Filtering
-- **Total Executed Trials**: 43 flights ([data/processed/r3_experiment_manifest.csv](file:///home/purab/Purab/Projects/Research3/data/processed/r3_experiment_manifest.csv)).
+- **Total Executed Trials**: 43 flights ([data/processed/r3_experiment_manifest.csv](../data/processed/r3_experiment_manifest.csv)).
 - **Eligible Primary Trials**: 40 flights (8 base flights $\times$ 5 regimes).
 - **Active Flight Window**: Altitude filter $z \ge 2.0\text{ m}$ (takeoff and landing excluded).
-- **Valid Frame Samples**: Exactly 6,109 active frames per regime, totaling **30,545 frames** in [data/processed/r3_dataset_k5.csv](file:///home/purab/Purab/Projects/Research3/data/processed/r3_dataset_k5.csv).
+- **Valid Frame Samples**: Exactly 6,109 active frames per regime, totaling **30,545 frames** in [data/processed/r3_dataset_k5.csv](../data/processed/r3_dataset_k5.csv).
 - **Causal Lag Handling**: The first 5 frames (backward lag $5$) and last 5 frames (forward label horizon $K=5$) per trial were removed to enforce strict temporal causality.
 
 ### 8.2 Excluded Trials Documentation
-3 stationary hover trials (`p3x_HOVER_L0_R1`, `p3x_HOVER_L0_R2`, `p3x_HOVER_L0_R3`) were logged and excluded prior to primary analysis ([data/processed/r3_eligibility_log.csv](file:///home/purab/Purab/Projects/Research3/data/processed/r3_eligibility_log.csv)).
+3 stationary hover trials (`p3x_HOVER_L0_R1`, `p3x_HOVER_L0_R2`, `p3x_HOVER_L0_R3`) were logged and excluded prior to primary analysis ([data/processed/r3_eligibility_log.csv](../data/processed/r3_eligibility_log.csv)).
 - *Exclusion Criterion*: Stationary hover produces zero translational baseline ($t \to 0$), causing the monocular 5-point Essential matrix epipolar geometry to become degenerate ($\text{rank}(E) < 2$). Under zero baseline, monocular VO fails identically even in pristine conditions, confounding the mechanism analysis.
 
 ---
 
 ## 9. Frozen R2 Model Integrity
-The authoritative Research 2 artifacts were verified and frozen prior to evaluation ([models/frozen_r2_manifest.json](file:///home/purab/Purab/Projects/Research3/models/frozen_r2_manifest.json)):
-- **MLP Checkpoint**: [models/expanded_mlp.pt](file:///home/purab/Purab/Projects/Research3/models/expanded_mlp.pt)  
+The authoritative Research 2 artifacts were verified and frozen prior to evaluation ([models/frozen_r2_manifest.json](../models/frozen_r2_manifest.json)):
+- **MLP Checkpoint**: [models/expanded_mlp.pt](../models/expanded_mlp.pt)  
   `SHA-256: 93acd1048a6954a143aac873a3fa8a4548c8a6230aa574aa1ea3fcce17b78e9f`
-- **Scaler Joblib**: [models/expanded_scaler.joblib](file:///home/purab/Purab/Projects/Research3/models/expanded_scaler.joblib)  
+- **Scaler Joblib**: [models/expanded_scaler.joblib](../models/expanded_scaler.joblib)  
   `SHA-256: 4e9c6ebacb5ac4a554ed69a56d4c7c48df8ef1036b53907181b6dc221550b105`
-- **Architecture**: `SmallMLP` ($15 \to 32 \to 16 \to 1$, 1,041 parameters).
+- **Architecture**: `SmallMLP` ($15 \to 32 \to 16 \to 1$, 1,057 parameters).
 - **Features**: 15 strictly ordered inputs (`eis_yaw_rate_deg`, `feature_vel_mean`, `is_r_frame` at lags $\{0, 1, 2, 3, 5\}$).
 - **Decision Threshold**: $\theta = 0.50$ (frozen, uncalibrated).
 - **Integrity Status**: Byte-for-byte identical to Research 2. Zero retraining or recalibration occurred.
@@ -132,7 +135,7 @@ The authoritative Research 2 artifacts were verified and frozen prior to evaluat
 ---
 
 ## 10. Quantitative Results
-The frozen R2 predictor was evaluated across all 30,545 frames in [data/processed/r3_frozen_r2_evaluation_metrics.json](file:///home/purab/Purab/Projects/Research3/data/processed/r3_frozen_r2_evaluation_metrics.json):
+The frozen R2 predictor was evaluated across all 30,545 frames in [data/processed/r3_frozen_r2_evaluation_metrics.json](../data/processed/r3_frozen_r2_evaluation_metrics.json):
 
 ### 10.1 Overall Transfer Performance
 - **AUROC**: **0.7906** (95% bootstrap CI: **[0.7856, 0.7958]**)
@@ -186,7 +189,7 @@ A critical distinction must be maintained between **frame-level classification**
 - **Episode-Level Early Warning**: Evaluates whether the predictor emits an advance warning in the causal lookahead window $[t_{\text{onset}} - 0.165\text{ s}, t_{\text{onset}})$ prior to the onset of a contiguous tracking failure event.
 
 ### 13.2 Episode Early-Warning Metrics ($N=5,964$ episodes)
-From [data/processed/r3_lead_time_early_warnings.json](file:///home/purab/Purab/Projects/Research3/data/processed/r3_lead_time_early_warnings.json):
+From [data/processed/r3_lead_time_early_warnings.json](../data/processed/r3_lead_time_early_warnings.json):
 * **True Early Warnings**: **5,402 episodes (90.58%)** triggered a warning prior to failure onset.
 * **Post-Failure Detections**: **520 episodes (8.72%)** were first flagged after inliers dropped below 8.
 * **Missed Failure Episodes**: **42 episodes (0.70%)** received no warning throughout the failure event.
@@ -199,7 +202,7 @@ From [data/processed/r3_lead_time_early_warnings.json](file:///home/purab/Purab/
 ---
 
 ## 14. Statistical Analysis
-From [data/processed/r3_statistical_comparison.json](file:///home/purab/Purab/Projects/Research3/data/processed/r3_statistical_comparison.json):
+From [data/processed/r3_statistical_comparison.json](../data/processed/r3_statistical_comparison.json):
 1. **Non-Parametric Bootstrap (B=2,000 resamples)**:
    - AUROC 95% CI: **[0.7856, 0.7958]**
    - F1 95% CI: **[0.6422, 0.6552]**
@@ -245,30 +248,30 @@ While aggregate discrimination transfers well (AUROC 0.7906 vs 0.8046), a clear 
 ## 19. Reproducibility and Artifact Index
 
 ### Script Pipeline
-- [scripts/00_verify_and_freeze_r2_artifacts.py](file:///home/purab/Purab/Projects/Research3/scripts/00_verify_and_freeze_r2_artifacts.py): Verifies and freezes authoritative R2 weights and scaler.
-- [scripts/01_generate_r3_visual_degradation_dataset.py](file:///home/purab/Purab/Projects/Research3/scripts/01_generate_r3_visual_degradation_dataset.py): Assembles experiment manifest and eligibility log.
-- [scripts/02_run_r3_offline_vo.py](file:///home/purab/Purab/Projects/Research3/scripts/02_run_r3_offline_vo.py): Executes canonical offline VO across all 40 trials under degradation.
-- [scripts/03_extract_features_and_labels.py](file:///home/purab/Purab/Projects/Research3/scripts/03_extract_features_and_labels.py): Extracts 15 lagged features and $K=5$ causal labels.
-- [scripts/04_evaluate_frozen_r2_transfer.py](file:///home/purab/Purab/Projects/Research3/scripts/04_evaluate_frozen_r2_transfer.py): Evaluates frozen R2 model without retraining.
-- [scripts/05_compute_motion_distribution_comparison.py](file:///home/purab/Purab/Projects/Research3/scripts/05_compute_motion_distribution_comparison.py): Computes motion distributions and separation statistics.
-- [scripts/06_analyze_lead_time_and_early_warnings.py](file:///home/purab/Purab/Projects/Research3/scripts/06_analyze_lead_time_and_early_warnings.py): Evaluates episode dynamics and lead-time distributions.
-- [scripts/07_statistical_significance_tests.py](file:///home/purab/Purab/Projects/Research3/scripts/07_statistical_significance_tests.py): Computes bootstrap CIs, Mann-Whitney U, and Wilcoxon tests.
-- [scripts/08_generate_r3_figures.py](file:///home/purab/Purab/Projects/Research3/scripts/08_generate_r3_figures.py): Generates publication figures.
-- [scripts/run_r3_analysis.sh](file:///home/purab/Purab/Projects/Research3/scripts/run_r3_analysis.sh): Master execution script.
+- [scripts/00_verify_and_freeze_r2_artifacts.py](../scripts/00_verify_and_freeze_r2_artifacts.py): Verifies and freezes authoritative R2 weights and scaler.
+- [scripts/01_generate_r3_visual_degradation_dataset.py](../scripts/01_generate_r3_visual_degradation_dataset.py): Assembles experiment manifest and eligibility log.
+- [scripts/02_run_r3_offline_vo.py](../scripts/02_run_r3_offline_vo.py): Executes canonical offline VO across all 40 trials under degradation.
+- [scripts/03_extract_features_and_labels.py](../scripts/03_extract_features_and_labels.py): Extracts 15 lagged features and $K=5$ causal labels.
+- [scripts/04_evaluate_frozen_r2_transfer.py](../scripts/04_evaluate_frozen_r2_transfer.py): Evaluates frozen R2 model without retraining.
+- [scripts/05_compute_motion_distribution_comparison.py](../scripts/05_compute_motion_distribution_comparison.py): Computes motion distributions and separation statistics.
+- [scripts/06_analyze_lead_time_and_early_warnings.py](../scripts/06_analyze_lead_time_and_early_warnings.py): Evaluates episode dynamics and lead-time distributions.
+- [scripts/07_statistical_significance_tests.py](../scripts/07_statistical_significance_tests.py): Computes bootstrap CIs, Mann-Whitney U, and Wilcoxon tests.
+- [scripts/08_generate_r3_figures.py](../scripts/08_generate_r3_figures.py): Generates publication figures.
+- [scripts/run_r3_analysis.sh](../scripts/run_r3_analysis.sh): Master execution script.
 
 ### Data Artifacts
-- [models/frozen_r2_manifest.json](file:///home/purab/Purab/Projects/Research3/models/frozen_r2_manifest.json): Model and scaler integrity manifest.
-- [data/processed/r3_experiment_manifest.csv](file:///home/purab/Purab/Projects/Research3/data/processed/r3_experiment_manifest.csv): Master experiment trial manifest (43 trials).
-- [data/processed/r3_eligibility_log.csv](file:///home/purab/Purab/Projects/Research3/data/processed/r3_eligibility_log.csv): Trial eligibility and exclusion log.
-- [data/processed/r3_dataset_k5.csv](file:///home/purab/Purab/Projects/Research3/data/processed/r3_dataset_k5.csv): Master dataset (30,545 frames, 15 features, $K=5$ labels).
-- [data/processed/r3_frozen_r2_evaluation_metrics.json](file:///home/purab/Purab/Projects/Research3/data/processed/r3_frozen_r2_evaluation_metrics.json): Primary evaluation results and confusion matrices.
-- [data/processed/r3_per_flight_metrics.csv](file:///home/purab/Purab/Projects/Research3/data/processed/r3_per_flight_metrics.csv): Per-flight performance breakdown.
-- [data/processed/r3_motion_comparison_summary.json](file:///home/purab/Purab/Projects/Research3/data/processed/r3_motion_comparison_summary.json): Motion statistics and statistical separation tests.
-- [data/processed/r3_lead_time_early_warnings.json](file:///home/purab/Purab/Projects/Research3/data/processed/r3_lead_time_early_warnings.json): Episode-level early warning and lead-time data.
-- [data/processed/r3_statistical_comparison.json](file:///home/purab/Purab/Projects/Research3/data/processed/r3_statistical_comparison.json): Bootstrap CIs, hypothesis tests, and classification rationale.
+- [models/frozen_r2_manifest.json](../models/frozen_r2_manifest.json): Model and scaler integrity manifest.
+- [data/processed/r3_experiment_manifest.csv](../data/processed/r3_experiment_manifest.csv): Master experiment trial manifest (43 trials).
+- [data/processed/r3_eligibility_log.csv](../data/processed/r3_eligibility_log.csv): Trial eligibility and exclusion log.
+- [data/processed/r3_dataset_k5.csv](../data/processed/r3_dataset_k5.csv): Master dataset (30,545 frames, 15 features, $K=5$ labels).
+- [data/processed/r3_frozen_r2_evaluation_metrics.json](../data/processed/r3_frozen_r2_evaluation_metrics.json): Primary evaluation results and confusion matrices.
+- [data/processed/r3_per_flight_metrics.csv](../data/processed/r3_per_flight_metrics.csv): Per-flight performance breakdown.
+- [data/processed/r3_motion_comparison_summary.json](../data/processed/r3_motion_comparison_summary.json): Motion statistics and statistical separation tests.
+- [data/processed/r3_lead_time_early_warnings.json](../data/processed/r3_lead_time_early_warnings.json): Episode-level early warning and lead-time data.
+- [data/processed/r3_statistical_comparison.json](../data/processed/r3_statistical_comparison.json): Bootstrap CIs, hypothesis tests, and classification rationale.
 
 ### Publication Figures
-- [figures/fig1_r2_vs_r3_performance.png](file:///home/purab/Purab/Projects/Research3/figures/fig1_r2_vs_r3_performance.png): Performance comparison across regimes with 95% bootstrap CIs.
-- [figures/fig2_performance_vs_degradation_level.png](file:///home/purab/Purab/Projects/Research3/figures/fig2_performance_vs_degradation_level.png): Tracking breakdown and predictor probability shifts vs degradation severity.
-- [figures/fig3_motion_distribution_comparison.png](file:///home/purab/Purab/Projects/Research3/figures/fig3_motion_distribution_comparison.png): Kinematic distributions demonstrating benign vehicle motion.
-- [figures/fig4_early_warning_behavior.png](file:///home/purab/Purab/Projects/Research3/figures/fig4_early_warning_behavior.png): Failure episode classification and lead-time distributions.
+- [figures/fig1_r2_vs_r3_performance.png](../figures/fig1_r2_vs_r3_performance.png): Performance comparison across regimes with 95% bootstrap CIs.
+- [figures/fig2_performance_vs_degradation_level.png](../figures/fig2_performance_vs_degradation_level.png): Tracking breakdown and predictor probability shifts vs degradation severity.
+- [figures/fig3_motion_distribution_comparison.png](../figures/fig3_motion_distribution_comparison.png): Kinematic distributions demonstrating benign vehicle motion.
+- [figures/fig4_early_warning_behavior.png](../figures/fig4_early_warning_behavior.png): Failure episode classification and lead-time distributions.

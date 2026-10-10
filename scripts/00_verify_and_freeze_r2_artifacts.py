@@ -24,9 +24,8 @@ import joblib
 import torch
 import torch.nn as nn
 
-# Base paths
-R2_ROOT = Path("/home/purab/Purab/Projects/Research2")
 R3_ROOT = Path(__file__).resolve().parent.parent
+R2_ROOT = R3_ROOT.parent / "Research2"
 
 R2_MODEL_PATH = R2_ROOT / "models" / "expanded_mlp.pt"
 R2_SCALER_PATH = R2_ROOT / "models" / "expanded_scaler.joblib"

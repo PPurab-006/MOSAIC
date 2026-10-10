@@ -1,0 +1,30 @@
+{
+  "title": "MOSAIC: Evaluating Telemetry-Based Visual Odometry Failure Prediction Under Non-Motion Visual Degradation",
+  "creators": [
+    {
+      "name": "Sen, Purab",
+      "orcid": "0009-0002-8385-1435",
+      "affiliation": "Independent Researcher"
+    }
+  ],
+  "upload_type": "software",
+  "license": "apache-2.0",
+  "access_right": "open",
+  "version": "2.0.0",
+  "description": "Replication package for MOSAIC: strict prospective evaluation of telemetry-based visual odometry failure prediction under optical contrast attenuation and domain shift, with verification scripts, model weights, and benchmark datasets.",
+  "keywords": [
+    "visual odometry",
+    "failure prediction",
+    "domain shift",
+    "label leakage",
+    "UAV navigation",
+    "telemetry"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.23267668",
+      "relation": "isDerivedFrom",
+      "scheme": "doi"
+    }
+  ]
+}

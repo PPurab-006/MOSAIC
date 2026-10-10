@@ -13,6 +13,7 @@ Processes raw_vo.csv from each trial:
   5. Aggregates into data/processed/r3_dataset_k5.csv
 """
 
+import argparse
 import json
 from pathlib import Path
 import numpy as np
@@ -23,6 +24,7 @@ RAW_DIR = R3_ROOT / "data" / "raw"
 PROCESSED_DIR = R3_ROOT / "data" / "processed"
 MANIFEST_PATH = PROCESSED_DIR / "r3_experiment_manifest.csv"
 OUTPUT_DATASET_PATH = PROCESSED_DIR / "r3_dataset_k5.csv"
+OUTPUT_STRICT_DATASET_PATH = PROCESSED_DIR / "r3_dataset_k5_strict.csv"
 
 BASE_FEATURES = ["eis_yaw_rate_deg", "feature_vel_mean", "is_r_frame"]
 FEATURE_LAGS = [0, 1, 2, 3, 5]
@@ -45,7 +47,7 @@ META_COLS = [
 FINAL_COLS = META_COLS + FEATURE_COLS
 
 
-def process_trial_features(trial_row: dict, k: int = 5) -> pd.DataFrame:
+def process_trial_features(trial_row: dict, k: int = 5, legacy_label: bool = False) -> pd.DataFrame:
     trial_id = trial_row["trial_id"]
     trial_dir = RAW_DIR / trial_id
     raw_vo_path = trial_dir / "raw_vo.csv"
@@ -61,7 +63,10 @@ def process_trial_features(trial_row: dict, k: int = 5) -> pd.DataFrame:
     df["is_failure_current_frame"] = df["is_failure"]
 
     # 2. Forward-looking failure window for next K frames
-    shifts = pd.concat([df["is_failure"].shift(-step) for step in range(k + 1)], axis=1)
+    # Legacy: includes current frame step=0 (range(0, k+1))
+    # Strict: strictly future frames step in range(1, k+1)
+    shift_steps = range(k + 1) if legacy_label else range(1, k + 1)
+    shifts = pd.concat([df["is_failure"].shift(-step) for step in shift_steps], axis=1)
     df["is_failure_within_next_k"] = shifts.max(axis=1)
     df.loc[shifts.isna().any(axis=1), "is_failure_within_next_k"] = np.nan
 
@@ -77,6 +82,10 @@ def process_trial_features(trial_row: dict, k: int = 5) -> pd.DataFrame:
     expected_len = n_raw - (max(FEATURE_LAGS) + k)
     if len(df_valid) != expected_len:
         raise ValueError(f"{trial_id}: expected {expected_len} frames, got {len(df_valid)}")
+
+    # 5. Strict label requirement: purge frames where failure has already occurred (F_t == 1)
+    if not legacy_label:
+        df_valid = df_valid[df_valid["is_failure_current_frame"] == 0].copy().reset_index(drop=True)
 
     # Add metadata
     df_valid["trial_id"] = trial_id
@@ -96,8 +105,25 @@ def process_trial_features(trial_row: dict, k: int = 5) -> pd.DataFrame:
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Research 3 — Step 3: Feature Extraction and Dataset Assembly")
+    parser.add_argument(
+        "--legacy-label",
+        action="store_true",
+        help="Use legacy label window range(0, k+1) without purging F_t=1 frames (v1 behavior)",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help="Custom output dataset CSV path (default: data/processed/r3_dataset_k5_strict.csv, or r3_dataset_k5.csv if --legacy-label)",
+    )
+    args = parser.parse_args()
+
+    target_output_path = args.output or (OUTPUT_DATASET_PATH if args.legacy_label else OUTPUT_STRICT_DATASET_PATH)
+
     print("=" * 70)
-    print("Research 3 — Step 3: Feature Extraction and Dataset Assembly")
+    mode_str = "LEGACY (v1, range(0, k+1), includes F_t=1)" if args.legacy_label else "STRICT (v2, range(1, k+1), purges F_t=1)"
+    print(f"Research 3 — Step 3: Feature Extraction [{mode_str}]")
     print("=" * 70)
 
     manifest_df = pd.read_csv(MANIFEST_PATH)
@@ -108,14 +134,15 @@ def main():
 
     for i, t_row in enumerate(eligible_trials, 1):
         t_id = t_row["trial_id"]
-        df_t = process_trial_features(t_row, k=5)
+        df_t = process_trial_features(t_row, k=5, legacy_label=args.legacy_label)
         trial_dfs.append(df_t)
 
     full_df = pd.concat(trial_dfs, axis=0, ignore_index=True)
-    full_df.to_csv(OUTPUT_DATASET_PATH, index=False)
+    target_output_path.parent.mkdir(parents=True, exist_ok=True)
+    full_df.to_csv(target_output_path, index=False)
 
     print("=" * 70)
-    print(f"-> Full R3 Dataset saved: {OUTPUT_DATASET_PATH}")
+    print(f"-> Full R3 Dataset saved: {target_output_path}")
     print(f"   Total trials: {len(trial_dfs)}")
     print(f"   Total valid samples (K=5): {len(full_df)}")
     print(f"   Overall failure rate (positive label): {full_df['is_failure_within_next_k'].mean()*100:.2f}%")

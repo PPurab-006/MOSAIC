@@ -31,8 +31,9 @@ RAW_DIR = R3_ROOT / "data" / "raw"
 MANIFEST_PATH = PROCESSED_DIR / "r3_experiment_manifest.csv"
 DATASET_PATH = PROCESSED_DIR / "r3_dataset_k5.csv"
 
-R2_EXPANDED_K5 = Path("/home/purab/Purab/Projects/Research2/data/processed/expanded_frames_v2_k5.csv")
-R2_FLIGHT_SPLIT = Path("/home/purab/Purab/Projects/Research2/data/processed/expanded_flight_split.csv")
+R2_ROOT = R3_ROOT.parent / "Research2"
+R2_EXPANDED_K5 = R2_ROOT / "data" / "processed" / "expanded_frames_v2_k5.csv"
+R2_FLIGHT_SPLIT = R2_ROOT / "data" / "processed" / "expanded_flight_split.csv"
 
 OUT_STATS_CSV = PROCESSED_DIR / "r3_motion_statistics.csv"
 OUT_SUMMARY_JSON = PROCESSED_DIR / "r3_motion_comparison_summary.json"

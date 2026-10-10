@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, models, or datasets in your research, please cite it as below."
+title: "MOSAIC: Evaluating Telemetry-Based Visual Odometry Failure Prediction Under Non-Motion Visual Degradation"
+version: 2.0.0
+date-released: "2026-10-10"
+license: Apache-2.0
+repository-code: "https://github.com/PPurab-006/MOSAIC"
+authors:
+  - family-names: "Sen"
+    given-names: "Purab"
+    orcid: "https://orcid.org/0009-0002-8385-1435"
+    affiliation: "Independent Researcher"
+keywords:
+  - "visual odometry"
+  - "failure prediction"
+  - "domain shift"
+  - "label leakage"
+  - "UAV navigation"
+  - "telemetry"
+references:
+  - type: software
+    title: "AEGIS: Telemetry-Based Early Warning of Monocular Visual Odometry Tracking Dropouts During Aggressive UAV Flight"
+    authors:
+      - family-names: "Sen"
+        given-names: "Purab"
+        orcid: "https://orcid.org/0009-0002-8385-1435"
+    doi: "10.5281/zenodo.23267668"
+    repository-code: "https://github.com/PPurab-006/AEGIS"

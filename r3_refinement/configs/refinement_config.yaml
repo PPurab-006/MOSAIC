@@ -15,7 +15,7 @@ model_architecture:
   hidden1: 32
   hidden2: 16
   output_dim: 1
-  parameters: 1041
+  parameters: 1057
 
 feature_specification:
   base_features:

@@ -3,7 +3,7 @@
   "trial_num": 38,
   "base_flight": "sweep_G_B_R3",
   "trajectory": "G_B",
-  "source_dataset_dir": "/home/purab/Purab/Projects/ROS/results/datasets/sweep_G_B_R3",
+  "source_dataset_dir": "../../../../ROS/results/datasets/sweep_G_B_R3",
   "regime": "MEDIUM",
   "regime_type": "constant",
   "description": "Medium degradation (4% gradient retention, moderate failure rate ~30-35%)",

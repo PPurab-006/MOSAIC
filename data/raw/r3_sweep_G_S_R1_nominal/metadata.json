@@ -3,7 +3,7 @@
   "trial_num": 16,
   "base_flight": "sweep_G_S_R1",
   "trajectory": "G_S",
-  "source_dataset_dir": "/home/purab/Purab/Projects/ROS/results/datasets/sweep_G_S_R1",
+  "source_dataset_dir": "../../../../ROS/results/datasets/sweep_G_S_R1",
   "regime": "NOMINAL",
   "regime_type": "constant",
   "description": "Nominal environment (100% texture, clear visibility)",

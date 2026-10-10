@@ -6,7 +6,7 @@ Verifies:
 1. Frozen R2 model and scaler SHA-256 hashes are immutable.
 2. Leak-free flight splits (zero flight overlap between train, val, and protected test).
 3. Exact feature definitions and order across frozen and refined models.
-4. Model architectures both match SmallMLP (15 -> 32 -> 16 -> 1, 1041 params).
+4. Model architectures both match SmallMLP (15 -> 32 -> 16 -> 1, 1057 params).
 5. All output metrics and figures exist and are non-empty.
 """
 
@@ -84,7 +84,7 @@ def test_leak_free_flight_splits():
 
 
 def test_model_architecture_and_parameters():
-    """Verify that both frozen and refined models use identical SmallMLP (1041 params)."""
+    """Verify that both frozen and refined models use identical SmallMLP (1057 params)."""
     sd_frozen = torch.load(FROZEN_MODEL_PATH, map_location="cpu")
     sd_refined = torch.load(REFINED_MODEL_PATH, map_location="cpu")
 

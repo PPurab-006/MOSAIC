@@ -27,7 +27,7 @@ METRICS_DIR = REFINEMENT_DIR / "results" / "metrics"
 
 MANIFEST_PATH = REFINEMENT_DIR / "manifests" / "refinement_split_manifest.json"
 LOCKED_THRESHOLDS_PATH = REFINEMENT_DIR / "models" / "locked_thresholds.json"
-DATASET_R2 = Path("/home/purab/Purab/Projects/Research2/data/processed/expanded_frames_v2_k5.csv")
+DATASET_R2 = R3_ROOT.parent / "Research2" / "data" / "processed" / "expanded_frames_v2_k5.csv"
 DATASET_R3 = R3_ROOT / "data" / "processed" / "r3_dataset_k5.csv"
 
 OUT_ABLATION_JSON = METRICS_DIR / "ablation_results.json"

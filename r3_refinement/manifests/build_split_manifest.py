@@ -20,7 +20,7 @@ R3_ROOT = Path(__file__).resolve().parent.parent.parent
 MANIFEST_DIR = R3_ROOT / "r3_refinement" / "manifests"
 MANIFEST_DIR.mkdir(parents=True, exist_ok=True)
 
-R2_SPLIT_PATH = Path("/home/purab/Purab/Projects/Research2/data/processed/expanded_flight_split.csv")
+R2_SPLIT = R3_ROOT.parent / "Research2" / "data" / "processed" / "expanded_flight_split.csv"
 R3_MANIFEST_PATH = R3_ROOT / "data" / "processed" / "r3_experiment_manifest.csv"
 
 OUT_MANIFEST_JSON = MANIFEST_DIR / "refinement_split_manifest.json"

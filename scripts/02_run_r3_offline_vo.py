@@ -22,8 +22,8 @@ import cv2
 import numpy as np
 import pandas as pd
 
-# Insert path to ROS repository to import the canonical OfflineVOProcessor
-ROS_REPO = Path("/home/purab/Purab/Projects/ROS")
+R3_ROOT = Path(__file__).resolve().parent.parent
+ROS_REPO = R3_ROOT.parent / "ROS"
 sys.path.insert(0, str(ROS_REPO / "src" / "pipelines"))
 from run_offline_vo import OfflineVOProcessor
 

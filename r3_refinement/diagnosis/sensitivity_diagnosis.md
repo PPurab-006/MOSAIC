@@ -70,7 +70,7 @@ We classify the observed behavior into the taxonomy requested:
 To resolve this limitation without methodology drift, we formulate the **minimal, scientifically justified refinement**:
 
 ### Model Architecture and Features (Immutable)
-- Architecture: Identical `SmallMLP(15, 32, 16, 1)` (1,041 parameters).
+- Architecture: Identical `SmallMLP(15, 32, 16, 1)` (1,057 parameters).
 - Features: Identical 15 lagged features (`eis_yaw_rate_deg`, `feature_vel_mean`, `is_r_frame` at lags $\{0, 1, 2, 3, 5\}$).
 - Target: Identical causal $K=5$ horizon ($\tau = 0.165\text{ s}$).
 

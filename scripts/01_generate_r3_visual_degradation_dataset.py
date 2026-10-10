@@ -21,7 +21,7 @@ R3_ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = R3_ROOT / "configs" / "r3_experiment_config.yaml"
 PROCESSED_DIR = R3_ROOT / "data" / "processed"
 RAW_DIR = R3_ROOT / "data" / "raw"
-DATASETS_BASE = Path("/home/purab/Purab/Projects/ROS/results/datasets")
+DATASETS_BASE = R3_ROOT.parent / "ROS" / "results" / "datasets"
 
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 RAW_DIR.mkdir(parents=True, exist_ok=True)

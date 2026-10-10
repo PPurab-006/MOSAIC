@@ -51,8 +51,9 @@ WARNINGS_JSON_PATH = PROCESSED_DIR / "r3_lead_time_early_warnings.json"
 STATISTICS_JSON_PATH = PROCESSED_DIR / "r3_statistical_comparison.json"
 EPISODES_CSV_PATH = PROCESSED_DIR / "r3_episode_details.csv"
 
-R2_EXPANDED_K5 = Path("/home/purab/Purab/Projects/Research2/data/processed/expanded_frames_v2_k5.csv")
-R2_FLIGHT_SPLIT = Path("/home/purab/Purab/Projects/Research2/data/processed/expanded_flight_split.csv")
+R2_ROOT = R3_ROOT.parent / "Research2"
+R2_EXPANDED_K5 = R2_ROOT / "data" / "processed" / "expanded_frames_v2_k5.csv"
+R2_FLIGHT_SPLIT = R2_ROOT / "data" / "processed" / "expanded_flight_split.csv"
 
 
 def plot_fig1_r2_vs_r3(metrics_data, stats_data):

@@ -3,7 +3,7 @@
   "trial_num": 20,
   "base_flight": "sweep_G_S_R1",
   "trajectory": "G_S",
-  "source_dataset_dir": "/home/purab/Purab/Projects/ROS/results/datasets/sweep_G_S_R1",
+  "source_dataset_dir": "../../../../ROS/results/datasets/sweep_G_S_R1",
   "regime": "TRANSITION",
   "regime_type": "dynamic",
   "description": "Dynamic visual degradation onset during steady flight (evaluates early warning dynamics)",

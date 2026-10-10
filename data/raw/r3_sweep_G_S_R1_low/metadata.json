@@ -3,7 +3,7 @@
   "trial_num": 17,
   "base_flight": "sweep_G_S_R1",
   "trajectory": "G_S",
-  "source_dataset_dir": "/home/purab/Purab/Projects/ROS/results/datasets/sweep_G_S_R1",
+  "source_dataset_dir": "../../../../ROS/results/datasets/sweep_G_S_R1",
   "regime": "LOW",
   "regime_type": "constant",
   "description": "Low degradation (8% gradient retention, mild visual degradation)",

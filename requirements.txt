@@ -1,0 +1,14 @@
+# Pinned dependencies for MOSAIC (Research 3)
+# Platform: Linux x86_64, Python 3.14 / 3.11
+
+torch==2.14.0
+scikit-learn==1.9.1
+scipy==1.18.1
+numpy==2.5.3
+pandas==3.0.6
+opencv-python==4.10.0.84
+joblib==1.6.0
+pyyaml==6.0.3
+matplotlib==3.10.7
+seaborn==0.13.2
+pytest==9.0.2

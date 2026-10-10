@@ -1,0 +1,5 @@
+regime,samples,positives,frozen_r2_auroc,model_a_auroc,model_b_auroc
+NOMINAL,2231,245,0.7661,0.7356,0.7473
+LOW,2137,645,0.6935,0.6711,0.6816
+TRANSITION,1665,823,0.4711,0.9279,0.969
+MEDIUM,1546,1458,0.2724,0.6169,0.7159

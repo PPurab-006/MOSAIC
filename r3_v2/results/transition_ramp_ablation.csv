@@ -1,0 +1,6 @@
+seed,model_b_transition_auroc,model_b_time_transition_auroc,delta_time_minus_b
+42,0.9707,0.9662,-0.0045
+43,0.9681,0.9675,-0.0006
+44,0.9695,0.9632,-0.0063
+45,0.9684,0.9669,-0.0015
+46,0.965,0.9673,0.0023
